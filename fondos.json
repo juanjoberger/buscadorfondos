@@ -1,0 +1,32 @@
+[
+    {
+        "nombre": "Capital Semilla Emprende",
+        "perfil": "emprendimiento",
+        "pais": "Chile",
+        "link": "https://www.sercotec.cl"
+    },
+    {
+        "nombre": "Fondo Fortalecimiento de Organizaciones",
+        "perfil": "ong",
+        "pais": "Chile",
+        "link": "#"
+    },
+    {
+        "nombre": "Subvención a la I+D Privada",
+        "perfil": "privado",
+        "pais": "LATAM",
+        "link": "#"
+    },
+    {
+        "nombre": "Fondo de Innovación Social",
+        "perfil": "ong",
+        "pais": "Chile",
+        "link": "#"
+    },
+    {
+        "nombre": "Startup Chile Build",
+        "perfil": "emprendimiento",
+        "pais": "Chile",
+        "link": "#"
+    }
+]
