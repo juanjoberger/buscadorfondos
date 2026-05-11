@@ -1,34 +1,82 @@
 [
     {
-        "nombre": "Semilla Inicia para Mujeres",
+        "nombre": "Fondo Municipal de Innovación Valparaíso",
         "perfil": "emprendimiento",
+        "pais": "Chile",
+        "region": "Valparaiso",
+        "comuna": "Valparaíso",
+        "link": "https://www.munivalpo.cl"
+    },
+    {
+        "nombre": "GORE Valparaíso - Reactivación Pyme",
+        "perfil": "emprendimiento",
+        "pais": "Chile",
+        "region": "Valparaiso",
+        "comuna": "Todas",
+        "link": "https://www.gorevalparaiso.cl"
+    },
+    {
+        "nombre": "Fondo de Desarrollo Vecinal (FONDEVE) Santiago",
+        "perfil": "ong",
         "pais": "Chile",
         "region": "Metropolitana",
         "comuna": "Santiago",
-        "link": "https://www.corfo.cl"
+        "link": "https://www.munistgo.cl"
     },
     {
-        "nombre": "Fondo Desarrollo Vecinal (FONDEVE)",
-        "perfil": "ong",
-        "pais": "Chile",
-        "region": "Valparaiso",
-        "comuna": "Valparaiso",
-        "link": "https://fondos.gob.cl"
-    },
-    {
-        "nombre": "Programa de Innovación CEPAL",
+        "nombre": "Fondo de Innovación para la Competitividad (FIC-R RM)",
         "perfil": "privado",
-        "pais": "Internacional",
-        "region": "Todas",
+        "pais": "Chile",
+        "region": "Metropolitana",
         "comuna": "Todas",
-        "link": "https://www.cepal.org"
+        "link": "https://www.gobiernosantiago.cl"
     },
     {
-        "nombre": "Capital Abeja Emprende",
+        "nombre": "Incuba Concepción - Capital Semilla Local",
         "perfil": "emprendimiento",
         "pais": "Chile",
         "region": "Biobio",
-        "comuna": "Concepcion",
+        "comuna": "Concepción",
+        "link": "https://www.concepcion.cl"
+    },
+    {
+        "nombre": "Capital Semilla Emprende (Sercotec)",
+        "perfil": "emprendimiento",
+        "pais": "Chile",
+        "region": "Todas",
+        "comuna": "Todas",
         "link": "https://www.sercotec.cl"
+    },
+    {
+        "nombre": "Fondo de Fortalecimiento ONG (Ministerio Secretaría General de Gobierno)",
+        "perfil": "ong",
+        "pais": "Chile",
+        "region": "Todas",
+        "comuna": "Todas",
+        "link": "https://fondos.gob.cl"
+    },
+    {
+        "nombre": "Ley de I+D (Corfo)",
+        "perfil": "privado",
+        "pais": "Chile",
+        "region": "Todas",
+        "comuna": "Todas",
+        "link": "https://www.corfo.cl"
+    },
+    {
+        "nombre": "Subvención Global ONU Mujeres",
+        "perfil": "emprendimiento",
+        "pais": "Internacional",
+        "region": "Todas",
+        "comuna": "Todas",
+        "link": "https://www.unwomen.org"
+    },
+    {
+        "nombre": "Fondo de Innovación BID Lab",
+        "perfil": "privado",
+        "pais": "LATAM",
+        "region": "Todas",
+        "comuna": "Todas",
+        "link": "https://bidlab.org"
     }
 ]
