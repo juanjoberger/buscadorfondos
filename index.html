@@ -2,88 +2,54 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador de Fondos Chile - LATAM</title>
+    <title>Buscador de Fondos - Chile & LATAM</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 text-gray-800">
-
-    <!-- Header -->
-    <header class="bg-blue-900 text-white p-6 text-center">
-        <h1 class="text-3xl font-bold">Buscador de Fondos Concursables</h1>
-        <p class="mt-2">Chile y Latinoamérica</p>
-    </header>
-
-    <main class="max-w-4xl mx-auto p-6">
-        
-        <!-- Formulario de Suscripción -->
-        <section class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-xl font-semibold mb-4">Recibe fondos mensuales gratis</h2>
-            <form id="emailForm" class="flex flex-col md:flex-row gap-4">
-                <input type="email" placeholder="Tu correo electrónico" required 
-                       class="flex-1 p-2 border border-gray-300 rounded">
-                <select id="perfil" class="p-2 border border-gray-300 rounded">
-                    <option value="privado">Privado</option>
-                    <option value="ong">ONG</option>
-                    <option value="emprendimiento">Emprendimiento</option>
-                </select>
-                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
-                    Suscribirme
-                </button>
-            </form>
-        </section>
-
-        <!-- Listado de Fondos -->
-        <section id="fondosContainer">
-            <h2 class="text-2xl font-bold mb-4">Fondos Disponibles</h2>
-            <div id="listaFondos" class="grid gap-4">
-                <!-- El código JS insertará los fondos aquí -->
+<body class="bg-slate-50">
+    <nav class="bg-blue-800 p-4 text-white shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Buscador de Fondos</h1>
+            <div class="space-x-4">
+                <a href="/?perfil=privado" class="hover:underline">Privado</a>
+                <a href="/?perfil=ong" class="hover:underline">ONG</a>
+                <a href="/?perfil=emprendimiento" class="hover:underline">Emprendimiento</a>
             </div>
+        </div>
+    </nav>
 
-            <!-- Botón de Pago (Paywall) -->
-            <div id="paywall" class="mt-8 p-6 bg-yellow-100 border-l-4 border-yellow-500 rounded text-center">
-                <p class="mb-4 font-medium">Estás viendo la versión gratuita (3 fondos). Para ver los 50+ fondos disponibles y filtrar por región:</p>
-                <a href="https://buy.stripe.com/tu_link_de_pago" 
-                   class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 inline-block">
-                    Acceso Premium - $5.000 / mes
+    <main class="container mx-auto py-10 px-4">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-extrabold text-gray-900">Fondos para: <span class="capitalize text-blue-600">{{ perfil }}</span></h2>
+            <p class="text-gray-600">Mostrando {{ fondos|length }} de {{ total }} convocatorias encontradas.</p>
+        </div>
+
+        <div class="grid gap-6">
+            {% for fondo in fondos %}
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold">{{ fondo.nombre }}</h3>
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-500 uppercase">{{ fondo.pais }}</span>
+                </div>
+                <a href="{{ fondo.link }}" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-medium hover:bg-blue-200">Ver Detalles</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if not premium and total > 3 %}
+        <div class="mt-12 p-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl text-white text-center">
+            <h3 class="text-2xl font-bold mb-4">¡Desbloquea el resto de los fondos!</h3>
+            <p class="mb-6 opacity-90">Existen {{ total - 3 }} fondos más que coinciden con tu perfil.</p>
+            
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="https://link.mercadopago.cl/tu-link" class="bg-white text-blue-600 px-6 py-3 rounded-full font-bold shadow-xl">
+                    Pagar en Chile (CLP)
+                </a>
+                <a href="https://paypal.me/tu-usuario" class="bg-yellow-400 text-yellow-900 px-6 py-3 rounded-full font-bold shadow-xl">
+                    PayPal (USD)
                 </a>
             </div>
-        </section>
+        </div>
+        {% endif %}
     </main>
-
-    <script>
-        // Datos de ejemplo (Simulación de Base de Datos)
-        const fondos = [
-            { nombre: "Capital Semilla Emprende", perfil: "emprendimiento", link: "#", region: "Chile" },
-            { nombre: "Fondo Fortalecimiento ONG", perfil: "ong", link: "#", region: "LATAM" },
-            { nombre: "Subvención Privada I+D", perfil: "privado", link: "#", region: "Chile" },
-            { nombre: "Fondo de Innovación Social", perfil: "ong", link: "#", region: "Chile" }, // Este no se verá gratis
-            { nombre: "Startup Chile Build", perfil: "emprendimiento", link: "#", region: "LATAM" } // Este no se verá gratis
-        ];
-
-        const premium = false; // Cambiar a true manualmente para pruebas o mediante lógica de backend
-
-        function renderFondos() {
-            const container = document.getElementById('listaFondos');
-            const limite = premium ? fondos.length : 3;
-            
-            container.innerHTML = fondos.slice(0, limite).map(f => `
-                <div class="p-4 border border-gray-200 rounded bg-white shadow-sm flex justify-between items-center">
-                    <div>
-                        <h3 class="font-bold text-lg">${f.nombre}</h3>
-                        <span class="text-sm text-blue-600 uppercase">${f.perfil}</span> | 
-                        <span class="text-sm text-gray-500">${f.region}</span>
-                    </div>
-                    <a href="${f.link}" class="text-blue-500 underline">Ver convocatoria</a>
-                </div>
-            `).join('');
-
-            if (premium) {
-                document.getElementById('paywall').classList.add('hidden');
-            }
-        }
-
-        renderFondos();
-    </script>
 </body>
 </html>
