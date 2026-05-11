@@ -33,7 +33,6 @@ def index():
     # 5. Filtramos por Comuna
     if comuna_seleccionada != 'todas':
         resultados = [f for f in resultados if f.get('comuna') == comuna_seleccionada or f.get('comuna') == 'Todas']
-
     # 6. Lógica de Paywall
     total_disponibles = len(resultados)
     if not es_premium:
