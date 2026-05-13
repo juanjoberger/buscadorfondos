@@ -139,22 +139,21 @@ def index():
 # --- MOTOR DE CORREOS: RUTA SECRETA ---
 @app.route('/enviar-alertas-secreto-123')
 def enviar_alertas():
-    # Leemos las credenciales desde las variables de entorno de Render
     SMTP_SERVER = "smtp-relay.brevo.com"
     SMTP_PORT = 587
     SMTP_USER = os.environ.get('SMTP_USER') 
     SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
     REMITENTE = os.environ.get('SMTP_USER')
 
-    # Validación de seguridad
     if not SMTP_USER or not SMTP_PASSWORD:
-        return "Error: Faltan las credenciales SMTP en las variables de entorno de Render. El código en GitHub está seguro."
+        return "Error: Faltan las credenciales SMTP en las variables de entorno de Render."
 
     usuarios_alertas = User.query.filter_by(recibir_alertas=True).all()
     correos_enviados = 0
 
     try:
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        # Añadimos un timeout de 10 segundos para evitar el colapso del servidor (Error 502)
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
         server.starttls() 
         server.login(SMTP_USER, SMTP_PASSWORD)
 
@@ -176,17 +175,13 @@ def enviar_alertas():
                   <body style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
                     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 10px; border: 1px solid #e5e7eb;">
                         <h2 style="color: #312e81;">¡Hola! Tenemos fondos para ti.</h2>
-                        <p style="color: #4b5563;">Hemos encontrado estas convocatorias según tu perfil de <b>{usuario.perfil_interes}</b> en <b>{usuario.region_interes}</b>:</p>
-                        <ul style="color: #1f2937;">
-                            {lista_html}
-                        </ul>
-                        <p style="color: #4b5563; margin-top: 30px;">¡Mucho éxito en tu postulación!</p>
+                        <p style="color: #4b5563;">Hemos encontrado estas convocatorias según tu perfil:</p>
+                        <ul style="color: #1f2937;">{lista_html}</ul>
                     </div>
                   </body>
                 </html>
                 """
                 mensaje.attach(MIMEText(html, "html"))
-
                 server.sendmail(REMITENTE, usuario.email, mensaje.as_string())
                 correos_enviados += 1
 
@@ -194,7 +189,8 @@ def enviar_alertas():
         return f"Proceso terminado con éxito. Se enviaron {correos_enviados} correos de alerta."
 
     except Exception as e:
-        return f"Atención: Hubo un error de conexión al servidor de correos. Verifica tus contraseñas. Detalle técnico: {str(e)}"
+        # Esto capturará el error de red o autenticación antes de que Render lance el 502
+        return f"Atención: Hubo un error técnico al intentar conectar con Brevo. Detalle: {str(e)}" tus contraseñas. Detalle técnico: {str(e)}"
 
 # --- INYECCIÓN AUTOMÁTICA DE LA BASE DE DATOS ---
 with app.app_context():
