@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Cuenta - FondosLatam</title>
+    <title>Buscador de Fondos - Chile & LATAM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+<body class="bg-gray-50">
 
-   <!-- Navbar -->
+    <!-- Navbar Dinámico (Detecta si hay sesión iniciada) -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
@@ -21,11 +21,10 @@
                     <a href="/" class="font-extrabold text-xl text-indigo-900 tracking-tight">Fondos<span class="text-blue-600">Latam</span></a>
                 </div>
                 
-                <!-- Botones de Usuario Dinámicos -->
                 <div class="flex items-center gap-4">
                     {% if current_user.is_authenticated %}
-                        <span class="text-sm font-medium text-gray-600 hidden sm:block">Hola, {{ current_user.email.split('@')[0] }}</span>
-                        <a href="/logout" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors">Cerrar Sesión</a>
+                        <a href="/mi-perfil" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">⚙️ Mi Perfil</a>
+                        <a href="/logout" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors ml-4">Cerrar Sesión</a>
                     {% else %}
                         <a href="/login" class="text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Entrar</a>
                         <a href="/registro" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-xl font-bold transition-all shadow-sm">Registrarse</a>
@@ -35,41 +34,168 @@
         </div>
     </nav>
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Contraseña</label>
-                <input type="password" name="password" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">¿Qué tipo de fondos buscas?</label>
-                <select name="perfil" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <option value="emprendimiento">Emprendedores</option>
-                    <option value="ong">ONGs / Fundaciones</option>
-                    <option value="privado">Empresas Privadas</option>
-                    <option value="investigacion">Investigación / Académico</option>
+    <!-- Hero Section con Buscador -->
+    <div class="relative bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-600 pb-20 pt-16 text-center shadow-lg">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">
+                Encuentra el capital ideal para tu proyecto
+            </h1>
+            <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto font-light">
+                Base de datos curada con convocatorias abiertas para emprendimientos, ONGs, investigación y el sector privado en Chile y Latinoamérica.
+            </p>
+            
+            <form method="GET" action="/" class="bg-white/10 p-4 rounded-2xl backdrop-blur-md max-w-4xl mx-auto border border-white/20 shadow-xl flex flex-col md:flex-row gap-3">
+                
+                <select name="perfil" class="flex-1 bg-white text-gray-800 px-4 py-3 rounded-xl outline-none font-semibold">
+                    <option value="todos" {% if perfil == 'todos' %}selected{% endif %}>Todos los perfiles</option>
+                    <option value="privado" {% if perfil == 'privado' %}selected{% endif %}>Empresas Privadas</option>
+                    <option value="ong" {% if perfil == 'ong' %}selected{% endif %}>ONGs / Fundaciones</option>
+                    <option value="emprendimiento" {% if perfil == 'emprendimiento' %}selected{% endif %}>Emprendedores</option>
+                    <option value="investigacion" {% if perfil == 'investigacion' %}selected{% endif %}>Investigación / Académico</option>
                 </select>
-            </div>
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Tu región principal</label>
-                <select name="region" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                    <option value="Metropolitana">Metropolitana</option>
+                <select id="regionSelect" name="region" onchange="actualizarComunas()" class="flex-1 bg-white text-gray-800 px-4 py-3 rounded-xl outline-none font-semibold">
+                    <option value="todas">Todas las regiones</option>
+                    <option value="Arica y Parinacota">Arica y Parinacota</option>
+                    <option value="Tarapaca">Tarapacá</option>
+                    <option value="Antofagasta">Antofagasta</option>
+                    <option value="Atacama">Atacama</option>
+                    <option value="Coquimbo">Coquimbo</option>
                     <option value="Valparaiso">Valparaíso</option>
+                    <option value="Metropolitana">Metropolitana</option>
+                    <option value="OHiggins">O'Higgins</option>
+                    <option value="Maule">Maule</option>
+                    <option value="Nuble">Ñuble</option>
                     <option value="Biobio">Biobío</option>
                     <option value="Araucania">Araucanía</option>
-                    <!-- Aquí podemos agregar el resto de regiones después -->
+                    <option value="Los Rios">Los Ríos</option>
+                    <option value="Los Lagos">Los Lagos</option>
+                    <option value="Aysen">Aysén</option>
+                    <option value="Magallanes">Magallanes</option>
                 </select>
-            </div>
 
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md mt-4">
-                Registrarme Gratis
-            </button>
-        </form>
-        
-        <p class="text-center text-sm text-gray-500 mt-6">
-            ¿Ya tienes cuenta? <a href="#" class="text-indigo-600 font-semibold hover:underline">Inicia Sesión</a>
-        </p>
+                <select id="comunaSelect" name="comuna" class="flex-1 bg-white text-gray-800 px-4 py-3 rounded-xl outline-none font-semibold">
+                    <option value="todas">Todas las comunas</option>
+                </select>
+
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">
+                    Buscar
+                </button>
+            </form>
+        </div>
     </div>
 
+    <!-- Resultados -->
+    <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 -mt-10">
+        
+        <div class="flex justify-between items-end mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">Resultados Disponibles</h2>
+                <p class="text-gray-500 text-sm mt-1">Mostrando {{ fondos|length }} de {{ total }} convocatorias</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for fondo in fondos %}
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full group">
+                <div>
+                    <div class="flex justify-between items-start mb-4">
+                        {% if fondo.perfil == 'emprendimiento' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">🌱 Emprendimiento</span>
+                        {% elif fondo.perfil == 'ong' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">🤝 ONG</span>
+                        {% elif fondo.perfil == 'investigacion' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-800">🔬 Investigación</span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">🏢 Privado</span>
+                        {% endif %}
+                        
+                        <span class="text-xs font-bold text-gray-400 bg-gray-50 border border-gray-200 px-2 py-1 rounded">📍 {{ fondo.region }}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 leading-tight group-hover:text-blue-600 transition-colors">{{ fondo.nombre }}</h3>
+                    <p class="text-sm text-gray-500 mb-4">Comuna: {{ fondo.comuna }}</p>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <!-- Lógica de protección del enlace -->
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ fondo.link }}" target="_blank" class="block w-full text-center bg-gray-50 hover:bg-blue-50 text-blue-700 font-semibold py-2.5 rounded-xl border border-gray-200 hover:border-blue-200 transition-colors">
+                            Ver convocatoria
+                        </a>
+                    {% else %}
+                        <a href="/login" class="block w-full text-center bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 font-semibold py-2.5 rounded-xl border border-gray-200 transition-colors">
+                            🔒 Inicia sesión para acceder
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Muro de Registro Gratuito -->
+        {% if not current_user.is_authenticated and total > 3 %}
+        <div class="mt-16 bg-white rounded-3xl overflow-hidden shadow-2xl border border-indigo-100 max-w-4xl mx-auto relative">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-300 to-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 transform translate-x-1/2 -translate-y-1/2"></div>
+            
+            <div class="relative p-8 md:p-12 text-center">
+                <span class="inline-block bg-indigo-100 text-indigo-800 text-sm font-bold px-4 py-1.5 rounded-full mb-4">🔓 Desbloquea la Base de Datos</span>
+                <h3 class="text-3xl font-extrabold text-gray-900 mb-4">Hay {{ total - 3 }} fondos más escondidos</h3>
+                <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Crea una cuenta gratuita hoy mismo para explorar el listado completo y configurar alertas automáticas para tu perfil y región.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="/registro" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-indigo-700 hover:-translate-y-0.5 transition-all w-full sm:w-auto">
+                        Crear Cuenta Gratis
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-20 py-8 text-center text-gray-500 text-sm">
+        <p>&copy; 2026 FondosLatam. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Script de Comunas -->
+    <script>
+        const datosUbicacion = {
+            "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
+            "Tarapaca": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
+            "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"],
+            "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
+            "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paihuano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
+            "Valparaiso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"],
+            "Metropolitana": ["Santiago", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"],
+            "OHiggins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchigüe", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"],
+            "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"],
+            "Nuble": ["Chillán", "Bulnes", "Cobquecura", "Coelemu", "Coihueco", "Chillán Viejo", "El Carmen", "Ninhue", "Ñiquén", "Pemuco", "Pinto", "Portezuelo", "Quillón", "Quirihue", "Ránquil", "San Carlos", "San Fabián", "San Ignacio", "Trehuaco", "Yungay"],
+            "Biobio": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Hualpén", "Lebu", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Los Álamos", "Tirúa", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"],
+            "Araucania": ["Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"],
+            "Los Rios": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Futrono", "Lago Ranco", "Río Bueno"],
+            "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"],
+            "Aysen": ["Coihaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Cochrane", "O'Higgins", "Tortel", "Chile Chico", "Río Ibáñez"],
+            "Magallanes": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"]
+        };
+
+        function actualizarComunas() {
+            const region = document.getElementById("regionSelect").value;
+            const comunaSelect = document.getElementById("comunaSelect");
+            
+            comunaSelect.innerHTML = '<option value="todas">Todas las comunas</option>';
+            
+            if (datosUbicacion[region]) {
+                datosUbicacion[region].forEach(comuna => {
+                    const option = document.createElement("option");
+                    option.value = comuna;
+                    option.textContent = comuna;
+                    comunaSelect.appendChild(option);
+                });
+            }
+        }
+        
+        actualizarComunas();
+    </script>
 </body>
 </html>
