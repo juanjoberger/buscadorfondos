@@ -3,7 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-import json # Necesario para la inyección automática
+import json
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'clave_secreta_provisional_para_desarrollo'
@@ -17,7 +20,6 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 # --- MODELOS DE LA BASE DE DATOS ---
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
@@ -41,7 +43,6 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # --- RUTAS DE USUARIOS ---
-
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
@@ -108,7 +109,6 @@ def mi_perfil():
     return render_template('perfil.html')
 
 # --- RUTAS PRINCIPALES ---
-
 @app.route('/')
 def index():
     perfil_seleccionado = request.args.get('perfil', 'todos')
@@ -134,35 +134,81 @@ def index():
     if not current_user.is_authenticated:
         resultados = resultados[:3]
     
-    return render_template('index.html', 
-                           fondos=resultados, 
-                           perfil=perfil_seleccionado,
-                           region=region_seleccionada,
-                           total=total_disponibles)
+    return render_template('index.html', fondos=resultados, perfil=perfil_seleccionado, region=region_seleccionada, total=total_disponibles)
 
-# --- CREACIÓN E INYECCIÓN AUTOMÁTICA DE LA BASE DE DATOS ---
+# --- MOTOR DE CORREOS: RUTA SECRETA ---
+@app.route('/enviar-alertas-secreto-123')
+def enviar_alertas():
+    # === REEMPLAZA ESTOS DATOS CUANDO TENGAS TU CUENTA DE BREVO ===
+    SMTP_SERVER = "smtp-relay.brevo.com"
+    SMTP_PORT = 587
+    SMTP_USER = "tu_correo@gmail.com" # Tu correo de registro en Brevo
+    SMTP_PASSWORD = "TU_CLAVE_SMTP_AQUI" # La clave que te dará Brevo
+    REMITENTE = "tu_correo@gmail.com"
+    # ===============================================================
+
+    usuarios_alertas = User.query.filter_by(recibir_alertas=True).all()
+    correos_enviados = 0
+
+    try:
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls() 
+        server.login(SMTP_USER, SMTP_PASSWORD)
+
+        for usuario in usuarios_alertas:
+            # Buscamos fondos que coincidan con la región y perfil del usuario
+            fondos_match = Fondo.query.filter_by(perfil=usuario.perfil_interes).filter((Fondo.region == usuario.region_interes) | (Fondo.region == 'Todas')).all()
+
+            if fondos_match:
+                mensaje = MIMEMultipart("alternative")
+                mensaje["Subject"] = "💡 Nuevos fondos disponibles para tu proyecto"
+                mensaje["From"] = REMITENTE
+                mensaje["To"] = usuario.email
+
+                # Construimos la lista de fondos en HTML
+                lista_html = ""
+                for f in fondos_match:
+                    lista_html += f"<li style='margin-bottom: 10px;'><b>{f.nombre}</b> <br> <a href='{f.link}' style='color: #4f46e5;'>Ver convocatoria</a></li>"
+
+                html = f"""
+                <html>
+                  <body style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 10px; border: 1px solid #e5e7eb;">
+                        <h2 style="color: #312e81;">¡Hola! Tenemos fondos para ti.</h2>
+                        <p style="color: #4b5563;">Hemos encontrado estas convocatorias según tu perfil de <b>{usuario.perfil_interes}</b> en <b>{usuario.region_interes}</b>:</p>
+                        <ul style="color: #1f2937;">
+                            {lista_html}
+                        </ul>
+                        <p style="color: #4b5563; margin-top: 30px;">¡Mucho éxito en tu postulación!</p>
+                    </div>
+                  </body>
+                </html>
+                """
+                mensaje.attach(MIMEText(html, "html"))
+
+                server.sendmail(REMITENTE, usuario.email, mensaje.as_string())
+                correos_enviados += 1
+
+        server.quit()
+        return f"Proceso terminado con éxito. Se enviaron {correos_enviados} correos de alerta."
+
+    except Exception as e:
+        return f"Atención: Hubo un error de conexión al servidor de correos. Verifica tus contraseñas. Detalle técnico: {str(e)}"
+
+# --- INYECCIÓN AUTOMÁTICA DE LA BASE DE DATOS ---
 with app.app_context():
     db.create_all()
-    
-    # Automatización para Render: Cargar JSON si la BD está vacía
     if not Fondo.query.first():
         ruta_json = os.path.join(basedir, 'fondos.json')
         try:
             with open(ruta_json, 'r', encoding='utf-8') as archivo:
                 fondos_data = json.load(archivo)
                 for f in fondos_data:
-                    nuevo_fondo = Fondo(
-                        nombre=f['nombre'],
-                        perfil=f['perfil'],
-                        pais=f['pais'],
-                        region=f['region'],
-                        comuna=f['comuna'],
-                        link=f['link']
-                    )
+                    nuevo_fondo = Fondo(nombre=f['nombre'], perfil=f['perfil'], pais=f['pais'], region=f['region'], comuna=f['comuna'], link=f['link'])
                     db.session.add(nuevo_fondo)
                 db.session.commit()
         except FileNotFoundError:
-            pass # Si no encuentra el archivo, no hace nada y evita que el sitio se caiga
+            pass
 
 if __name__ == '__main__':
     app.run(debug=True)
