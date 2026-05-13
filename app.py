@@ -1,14 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, current_user
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import redirect, url_for, flash
 import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'clave_secreta_provisional_para_desarrollo'
 
-# FIX TÉCNICO: Calculamos la ruta absoluta del servidor para SQLite
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'fondoslatam.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -17,7 +15,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
-# --- MODELOS DE LA BASE DE DATOS (Las Tablas) ---
+# --- MODELOS DE LA BASE DE DATOS ---
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,25 +38,74 @@ class Fondo(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# --- RUTAS DE USUARIOS ---
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        perfil = request.form.get('perfil')
+        region = request.form.get('region')
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            flash('Este correo ya está registrado.')
+            return redirect(url_for('registro'))
+
+        nuevo_usuario = User(
+            email=email, 
+            password=generate_password_hash(password),
+            perfil_interes=perfil,
+            region_interes=region
+        )
+        
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+        
+        login_user(nuevo_usuario)
+        return redirect(url_for('index'))
+
+    return render_template('registro.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = User.query.filter_by(email=email).first()
+        
+        # Comparamos la contraseña encriptada
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            flash('Correo o contraseña incorrectos.')
+            return redirect(url_for('login'))
+            
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
 # --- RUTAS PRINCIPALES ---
 
 @app.route('/')
 def index():
-    # 1. Filtros capturados de la URL
     perfil_seleccionado = request.args.get('perfil', 'todos')
     region_seleccionada = request.args.get('region', 'todas')
     comuna_seleccionada = request.args.get('comuna', 'todas')
     
-    # 2. Búsqueda directa en la Base de Datos SQLAlchemy
     query = Fondo.query
-
     if perfil_seleccionado != 'todos':
         query = query.filter_by(perfil=perfil_seleccionado)
     
     resultados_brutos = query.all()
     resultados = []
     
-    # Filtrado lógico por Región y Comuna en cascada
     for f in resultados_brutos:
         coincide_region = (region_seleccionada == 'todas' or f.region == region_seleccionada or f.region == 'Todas')
         coincide_comuna = (comuna_seleccionada == 'todas' or f.comuna == comuna_seleccionada or f.comuna == 'Todas')
@@ -66,13 +113,13 @@ def index():
         if coincide_region and coincide_comuna:
             resultados.append(f)
 
-    # 3. Lógica de Paywall con usuarios de Base de Datos
     total_disponibles = len(resultados)
-    es_premium = False
     
+    # Lógica estricta de Premium
+    es_premium = False
     if current_user.is_authenticated and current_user.es_premium:
         es_premium = True
-    elif request.args.get('access') == 'premium': # Mantenemos la puerta trasera para pruebas
+    elif request.args.get('access') == 'premium': 
         es_premium = True
 
     if not es_premium:
@@ -84,60 +131,10 @@ def index():
                            region=region_seleccionada,
                            premium=es_premium,
                            total=total_disponibles)
-# --- RUTAS DE USUARIOS ---
 
-@app.route('/registro', methods=['GET', 'POST'])
-def registro():
-    # Si el usuario envía el formulario...
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        perfil = request.form.get('perfil')
-        region = request.form.get('region')
-
-        # 1. Verificamos si el correo ya existe en la Base de Datos
-        user = User.query.filter_by(email=email).first()
-        if user:
-            # Aquí idealmente mostraríamos un mensaje de error en pantalla
-            return redirect(url_for('registro'))
-
-        # 2. Creamos el nuevo usuario encriptando su contraseña
-        nuevo_usuario = User(
-            email=email, 
-            password=generate_password_hash(password), # Contraseña segura
-            perfil_interes=perfil,
-            region_interes=region
-        )
-        
-        # 3. Lo guardamos en la Base de Datos
-        db.session.add(nuevo_usuario)
-        db.session.commit()
-        
-        # 4. Iniciamos su sesión automáticamente y lo enviamos al inicio
-        login_user(nuevo_usuario)
-        return redirect(url_for('index'))
-
-    # Si entra a la página normalmente, le mostramos el formulario
-    return render_template('registro.html')
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-    
-# --- CREACIÓN E INYECCIÓN DE LA BASE DE DATOS ---
+# --- CREACIÓN DE LA BASE DE DATOS ---
 with app.app_context():
-    db.create_all() # Crea el archivo fondoslatam.db si no existe
-    
-    # Si la tabla de fondos está vacía, inyectamos ejemplos para verificar que funciona
-    if not Fondo.query.first():
-        fondo_1 = Fondo(nombre="Fondecyt de Iniciación en Investigación", perfil="investigacion", pais="Chile", region="Todas", comuna="Todas", link="https://anid.cl")
-        fondo_2 = Fondo(nombre="Capital Semilla Emprende (Sercotec)", perfil="emprendimiento", pais="Chile", region="Todas", comuna="Todas", link="https://www.sercotec.cl")
-        fondo_3 = Fondo(nombre="Fondo de Desarrollo Vecinal Santiago", perfil="ong", pais="Chile", region="Metropolitana", comuna="Santiago", link="https://munistgo.cl")
-        fondo_4 = Fondo(nombre="Subvención I+D Corfo", perfil="privado", pais="Chile", region="Todas", comuna="Todas", link="https://corfo.cl")
-        
-        db.session.add_all([fondo_1, fondo_2, fondo_3, fondo_4])
-        db.session.commit()
+    db.create_all()
 
 if __name__ == '__main__':
     app.run(debug=True)
