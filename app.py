@@ -139,13 +139,16 @@ def index():
 # --- MOTOR DE CORREOS: RUTA SECRETA ---
 @app.route('/enviar-alertas-secreto-123')
 def enviar_alertas():
-    # === REEMPLAZA ESTOS DATOS CUANDO TENGAS TU CUENTA DE BREVO ===
+    # Leemos las credenciales desde las variables de entorno de Render
     SMTP_SERVER = "smtp-relay.brevo.com"
     SMTP_PORT = 587
-    SMTP_USER = "jjbergerl@gmail.com" # Tu correo de registro en Brevo
-    SMTP_PASSWORD = "xsmtpsib-2ed4f90a3ae1892660d9ff9ce0c77ec8d20b1c6f15a3ffa541348d59def4ec3e-MFMuCHOuPrM1AcrG" # La clave que te dará Brevo
-    REMITENTE = "Juanjo de Buscador de Fondos"
-    # ===============================================================
+    SMTP_USER = os.environ.get('SMTP_USER') 
+    SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
+    REMITENTE = os.environ.get('SMTP_USER')
+
+    # Validación de seguridad
+    if not SMTP_USER or not SMTP_PASSWORD:
+        return "Error: Faltan las credenciales SMTP en las variables de entorno de Render. El código en GitHub está seguro."
 
     usuarios_alertas = User.query.filter_by(recibir_alertas=True).all()
     correos_enviados = 0
@@ -156,7 +159,6 @@ def enviar_alertas():
         server.login(SMTP_USER, SMTP_PASSWORD)
 
         for usuario in usuarios_alertas:
-            # Buscamos fondos que coincidan con la región y perfil del usuario
             fondos_match = Fondo.query.filter_by(perfil=usuario.perfil_interes).filter((Fondo.region == usuario.region_interes) | (Fondo.region == 'Todas')).all()
 
             if fondos_match:
@@ -165,7 +167,6 @@ def enviar_alertas():
                 mensaje["From"] = REMITENTE
                 mensaje["To"] = usuario.email
 
-                # Construimos la lista de fondos en HTML
                 lista_html = ""
                 for f in fondos_match:
                     lista_html += f"<li style='margin-bottom: 10px;'><b>{f.nombre}</b> <br> <a href='{f.link}' style='color: #4f46e5;'>Ver convocatoria</a></li>"
