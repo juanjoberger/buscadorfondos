@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import json # Necesario para la inyección automática
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'clave_secreta_provisional_para_desarrollo'
@@ -24,6 +25,7 @@ class User(UserMixin, db.Model):
     es_premium = db.Column(db.Boolean, default=False)
     perfil_interes = db.Column(db.String(50)) 
     region_interes = db.Column(db.String(50))
+    recibir_alertas = db.Column(db.Boolean, default=True)
 
 class Fondo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -57,7 +59,8 @@ def registro():
             email=email, 
             password=generate_password_hash(password),
             perfil_interes=perfil,
-            region_interes=region
+            region_interes=region,
+            recibir_alertas=True
         )
         
         db.session.add(nuevo_usuario)
@@ -75,7 +78,6 @@ def login():
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
         
-        # Comparamos la contraseña encriptada
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('index'))
@@ -90,6 +92,20 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.route('/mi-perfil', methods=['GET', 'POST'])
+@login_required
+def mi_perfil():
+    if request.method == 'POST':
+        current_user.perfil_interes = request.form.get('perfil')
+        current_user.region_interes = request.form.get('region')
+        current_user.recibir_alertas = request.form.get('alertas') == 'on' 
+        
+        db.session.commit()
+        flash('¡Tus preferencias han sido actualizadas!')
+        return redirect(url_for('mi_perfil'))
+        
+    return render_template('perfil.html')
 
 # --- RUTAS PRINCIPALES ---
 
@@ -115,26 +131,38 @@ def index():
 
     total_disponibles = len(resultados)
     
-    # Lógica estricta de Premium
-    es_premium = False
-    if current_user.is_authenticated and current_user.es_premium:
-        es_premium = True
-    elif request.args.get('access') == 'premium': 
-        es_premium = True
-
-    if not es_premium:
+    if not current_user.is_authenticated:
         resultados = resultados[:3]
     
     return render_template('index.html', 
                            fondos=resultados, 
                            perfil=perfil_seleccionado,
                            region=region_seleccionada,
-                           premium=es_premium,
                            total=total_disponibles)
 
-# --- CREACIÓN DE LA BASE DE DATOS ---
+# --- CREACIÓN E INYECCIÓN AUTOMÁTICA DE LA BASE DE DATOS ---
 with app.app_context():
     db.create_all()
+    
+    # Automatización para Render: Cargar JSON si la BD está vacía
+    if not Fondo.query.first():
+        ruta_json = os.path.join(basedir, 'fondos.json')
+        try:
+            with open(ruta_json, 'r', encoding='utf-8') as archivo:
+                fondos_data = json.load(archivo)
+                for f in fondos_data:
+                    nuevo_fondo = Fondo(
+                        nombre=f['nombre'],
+                        perfil=f['perfil'],
+                        pais=f['pais'],
+                        region=f['region'],
+                        comuna=f['comuna'],
+                        link=f['link']
+                    )
+                    db.session.add(nuevo_fondo)
+                db.session.commit()
+        except FileNotFoundError:
+            pass # Si no encuentra el archivo, no hace nada y evita que el sitio se caiga
 
 if __name__ == '__main__':
     app.run(debug=True)
