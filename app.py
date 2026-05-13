@@ -152,7 +152,6 @@ def enviar_alertas():
     correos_enviados = 0
 
     try:
-        # Añadimos un timeout de 10 segundos para evitar el colapso del servidor (Error 502)
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
         server.starttls() 
         server.login(SMTP_USER, SMTP_PASSWORD)
@@ -189,8 +188,7 @@ def enviar_alertas():
         return f"Proceso terminado con éxito. Se enviaron {correos_enviados} correos de alerta."
 
     except Exception as e:
-        # Esto capturará el error de red o autenticación antes de que Render lance el 502
-        return f"Atención: Hubo un error técnico al intentar conectar con Brevo. Detalle: {str(e)}" tus contraseñas. Detalle técnico: {str(e)}"
+        return f"Atención: Hubo un error técnico al intentar conectar con Brevo. Detalle: {str(e)}"
 
 # --- INYECCIÓN AUTOMÁTICA DE LA BASE DE DATOS ---
 with app.app_context():
