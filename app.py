@@ -142,9 +142,9 @@ def enviar_alertas():
     # === REEMPLAZA ESTOS DATOS CUANDO TENGAS TU CUENTA DE BREVO ===
     SMTP_SERVER = "smtp-relay.brevo.com"
     SMTP_PORT = 587
-    SMTP_USER = "tu_correo@gmail.com" # Tu correo de registro en Brevo
-    SMTP_PASSWORD = "TU_CLAVE_SMTP_AQUI" # La clave que te dará Brevo
-    REMITENTE = "tu_correo@gmail.com"
+    SMTP_USER = "jjbergerl@gmail.com" # Tu correo de registro en Brevo
+    SMTP_PASSWORD = "xsmtpsib-2ed4f90a3ae1892660d9ff9ce0c77ec8d20b1c6f15a3ffa541348d59def4ec3e-MFMuCHOuPrM1AcrG" # La clave que te dará Brevo
+    REMITENTE = "Juanjo de Buscador de Fondos"
     # ===============================================================
 
     usuarios_alertas = User.query.filter_by(recibir_alertas=True).all()
