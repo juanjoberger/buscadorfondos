@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import redirect, url_for, flash
 import os
 
 app = Flask(__name__)
@@ -82,7 +84,47 @@ def index():
                            region=region_seleccionada,
                            premium=es_premium,
                            total=total_disponibles)
+# --- RUTAS DE USUARIOS ---
 
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    # Si el usuario envía el formulario...
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        perfil = request.form.get('perfil')
+        region = request.form.get('region')
+
+        # 1. Verificamos si el correo ya existe en la Base de Datos
+        user = User.query.filter_by(email=email).first()
+        if user:
+            # Aquí idealmente mostraríamos un mensaje de error en pantalla
+            return redirect(url_for('registro'))
+
+        # 2. Creamos el nuevo usuario encriptando su contraseña
+        nuevo_usuario = User(
+            email=email, 
+            password=generate_password_hash(password), # Contraseña segura
+            perfil_interes=perfil,
+            region_interes=region
+        )
+        
+        # 3. Lo guardamos en la Base de Datos
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+        
+        # 4. Iniciamos su sesión automáticamente y lo enviamos al inicio
+        login_user(nuevo_usuario)
+        return redirect(url_for('index'))
+
+    # Si entra a la página normalmente, le mostramos el formulario
+    return render_template('registro.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+    
 # --- CREACIÓN E INYECCIÓN DE LA BASE DE DATOS ---
 with app.app_context():
     db.create_all() # Crea el archivo fondoslatam.db si no existe
