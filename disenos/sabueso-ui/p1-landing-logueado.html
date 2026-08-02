@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buscador — Sabueso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- P1 · Buscador — USUARIO CON CUENTA (sin hero, paginación C9) -->
+
+<header class="nav">
+  <div class="contenedor nav-inner">
+    <a class="marca" href="p1-landing-logueado.html" aria-label="Sabueso — inicio">
+      <svg class="marca-logo" width="38" height="24" viewBox="0 0 72 44" aria-hidden="true"><ellipse cx="43" cy="21" rx="16" ry="9" fill="#D98A55"/><path d="M55 15 Q63 9 61 2 L65 3 Q66 12 58 18 Z" fill="#D98A55"/><rect x="48" y="26" width="4.5" height="15" rx="2" fill="#D98A55"/><rect x="39" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><rect x="30" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><path d="M32 15 Q24 16 17 26 L10 35 Q8 38 11 39 L16 38 Q22 33 26 28 Q31 24 34 20 Z" fill="#D98A55"/><ellipse cx="21" cy="29" rx="3.6" ry="7.5" transform="rotate(28 21 29)" fill="#F6F1E7"/><circle cx="8" cy="33" r="2" fill="#37C97E"/><circle cx="4" cy="27" r="1.7" fill="#6FC49A"/><circle cx="2" cy="20" r="1.4" fill="#B7E0CB"/></svg>
+      <span class="marca-nombre">Sabueso</span>
+    </a>
+    <nav class="nav-acciones" aria-label="Idioma y cuenta">
+      <span class="idioma"><a href="#" aria-current="true" lang="es">ES</a><a href="p1-landing-pt.html" lang="pt-BR">PT</a></span>
+      <a class="nav-link" href="p7-mi-perfil.html">Mi perfil</a>
+      <a class="nav-link" href="p1-landing.html">Cerrar sesión</a>
+    </nav>
+  </div>
+</header>
+
+<div class="contenedor">
+  <p class="contexto">Buscando para: <strong>Cultura + Emprendimiento · Rancagua, O'Higgins, Chile</strong> <a href="p7-mi-perfil.html">Editar</a></p>
+</div>
+
+<div class="zona-buscador">
+  <form class="contenedor buscador" action="/" method="get" aria-label="Buscar fondos">
+    <div class="campo-buscar">
+      <label class="visualmente-oculto" for="q">Buscar por nombre o tema</label>
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#9B8B75" stroke-width="2"/><path d="M11 11l3.5 3.5" stroke="#9B8B75" stroke-width="2"/></svg>
+      <input type="search" id="q" name="q" placeholder="Busca por nombre o tema…">
+    </div>
+    <div class="campos-selects">
+      <div class="mini-campo">
+        <label for="perfil">Ámbito</label>
+        <select id="perfil" name="perfil">
+          <option value="">Todos los ámbitos</option>
+          <option selected>Cultura, patrimonio y artes</option>
+          <option>Emprendimiento</option>
+          <option>ONG / Fundación</option>
+          <option>Investigación / Académico</option>
+          <option>Empresa privada</option>
+        </select>
+      </div>
+      <div class="mini-campo">
+        <label for="pais">País</label>
+        <select id="pais" name="pais"><option value="">Todos los países</option><option selected>Chile</option><option>Argentina</option><option>Perú</option></select>
+      </div>
+      <div class="mini-campo">
+        <label for="region">Región</label>
+        <select id="region" name="region"><option value="">Todas las regiones</option><option selected>O'Higgins</option><option>Metropolitana</option><option>Valparaíso</option></select>
+      </div>
+      <div class="mini-campo">
+        <label for="comuna">Comuna / ciudad</label>
+        <select id="comuna" name="comuna"><option value="">Todas las comunas</option><option selected>Rancagua</option><option>Machalí</option><option>San Fernando</option></select>
+      </div>
+    </div>
+    <div class="buscador-pie">
+      <nav class="chips" aria-label="Filtrar por estado">
+        <a class="chip" href="#">Abiertas ahora</a>
+        <a class="chip" href="#">Próximas</a>
+        <a class="chip" href="#" aria-current="true">Todas</a>
+        <a class="chip" href="#">Cerradas</a>
+      </nav>
+      <button class="btn btn-canela btn-chico" type="submit">Buscar fondos</button>
+    </div>
+  </form>
+</div>
+
+<main class="contenedor zona-resultados">
+
+  <div class="resultados-cabeza">
+    <h2>Cerca de ti</h2>
+    <span class="resultados-orden">23 fondos · orden: local → global</span>
+  </div>
+  <div class="escala-barra" role="img" aria-label="Los resultados van de lo local a lo global"><span class="s1"></span><span class="s2"></span><span class="s3"></span><span class="s4"></span><span class="s5"></span></div>
+
+  <div class="grupos">
+
+    <p class="grupo-vacio"><strong>Tu comuna · Rancagua:</strong> aún no hay fondos exclusivos — los regionales y nacionales aplican para ti.</p>
+
+    <section>
+      <h3 class="grupo-titulo"><span class="n3">Tu país</span> <span class="grupo-sub">Chile · 4 fondos</span></h3>
+      <div class="grupo-lista grupo-lista--multi">
+        <article class="tarjeta">
+          <div class="tarjeta-franja franja--nacional"><span>Nacional · Chile</span><span class="pill-urgente">Cierra en 3 días</span></div>
+          <div class="tarjeta-cuerpo">
+            <h4 class="tarjeta-nombre"><a href="p2-detalle.html">Capital Semilla Emprende</a></h4>
+            <p class="tarjeta-inst">Sercotec · Emprendimiento · Chile</p>
+            <p class="tarjeta-monto">Hasta $3.500.000 <small>CLP</small></p>
+            <a class="btn-detalle" href="p2-detalle.html">Ver detalle</a>
+          </div>
+        </article>
+        <article class="tarjeta">
+          <div class="tarjeta-franja franja--nacional"><span>Nacional · Chile</span><span class="pill-urgente">Cierra en 13 días</span></div>
+          <div class="tarjeta-cuerpo">
+            <h4 class="tarjeta-nombre"><a href="p2-detalle.html">Fondecyt de Iniciación en Investigación</a></h4>
+            <p class="tarjeta-inst">ANID · Investigación / Académico · Chile</p>
+            <p class="tarjeta-monto">Hasta $40.000.000 <small>CLP</small></p>
+            <a class="btn-detalle" href="p2-detalle.html">Ver detalle</a>
+          </div>
+        </article>
+        <article class="tarjeta">
+          <div class="tarjeta-franja franja--nacional"><span>Nacional · Chile</span><span class="franja-estado">Abre 01-09-2026</span></div>
+          <div class="tarjeta-cuerpo">
+            <h4 class="tarjeta-nombre"><a href="p2-detalle.html">Fondart Nacional — Convocatoria 2027</a></h4>
+            <p class="tarjeta-inst">Ministerio de las Culturas · Cultura · Chile</p>
+            <p class="tarjeta-monto">Hasta $25.000.000 <small>CLP</small></p>
+            <a class="btn-detalle" href="p2-detalle.html">Ver detalle</a>
+          </div>
+        </article>
+        <article class="tarjeta tarjeta--cerrada">
+          <div class="tarjeta-franja franja--cerrada"><span>Nacional · Chile</span><span class="franja-estado">Cerró 15-07-2026</span></div>
+          <div class="tarjeta-cuerpo">
+            <h4 class="tarjeta-nombre"><a href="p2-detalle.html">Fondo de Fortalecimiento de Organizaciones de Interés Público</a></h4>
+            <p class="tarjeta-inst">Ministerio Secretaría General de Gobierno · ONG</p>
+            <p class="tarjeta-monto">$2.000.000 – $20.000.000 <small>CLP</small></p>
+            <a class="btn-detalle" href="p2-detalle.html">Ver detalle</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h3 class="grupo-titulo"><span class="n4">Latinoamérica</span> <span class="grupo-sub">1 fondo</span></h3>
+      <div class="grupo-lista grupo-lista--multi">
+        <article class="tarjeta">
+          <div class="tarjeta-franja franja--latam"><span>Latinoamérica</span><span class="franja-estado">Permanente</span></div>
+          <div class="tarjeta-cuerpo">
+            <h4 class="tarjeta-nombre"><a href="p2-detalle.html">Fondo de Innovación BID Lab</a></h4>
+            <p class="tarjeta-inst">Banco Interamericano de Desarrollo · Emprendimiento</p>
+            <p class="tarjeta-monto">Según convocatoria</p>
+            <a class="btn-detalle" href="p2-detalle.html">Ver detalle</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- C9 · paginación del embudo: avanzar = alejarse de tu comuna -->
+    <nav class="paginacion" aria-label="Paginación de resultados">
+      <a href="#" aria-disabled="true">← Más cerca<span>ya estás en lo más local</span></a>
+      <p class="pag-estado">Página 1 de 2 · 23 fondos</p>
+      <a class="pag-derecha" href="#">Más lejos →<span>LATAM y globales</span></a>
+    </nav>
+
+    <aside class="aviso-premium">
+      <div>
+        <strong>Que los próximos te lleguen al correo</strong>
+        <p>Fondos nuevos de tu comuna al mundo + recordatorios de cierre.</p>
+      </div>
+      <a class="btn btn-canela" href="p8-premium.html">Activar alertas · USD 3/mes</a>
+    </aside>
+
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="contenedor pie-inner">
+    <span>© 2026 FundHound — Sabueso · Sabujo</span>
+    <span><a href="p10-cobertura.html">Mapa de cobertura</a> · <a href="#">Contacto</a> · <a href="#">Términos</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

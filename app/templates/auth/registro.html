@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ t('crea_tu_cuenta') }} — Sabueso{% endblock %}
+
+{% block contenido %}
+<main class="contenedor zona-panel">
+  <div class="panel panel--ancho">
+    <div class="panel-cabeza">
+      {{ ui.logo(90, 55, "cafe") }}
+      <h1 class="panel-titulo">{{ t('suelta_sabueso') }}</h1>
+      <p class="panel-baja">{{ t('registro_baja')|safe }}</p>
+    </div>
+
+    <form action="{{ url_for('auth.registro') }}" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="campo">
+        <label for="email">{{ t('correo') }}</label>
+        <input type="email" id="email" name="email" autocomplete="email" required placeholder="tu@correo.com">
+      </div>
+      <div class="campo">
+        <label for="password">{{ t('contrasena') }}</label>
+        <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
+        <p class="campo-nota">{{ t('min8') }}</p>
+      </div>
+
+      <p class="form-titulo">{{ t('que_rastro') }}</p>
+      {{ ui.ambitos_checkboxes([]) }}
+
+      <div class="campo">
+        <label for="pais">{{ t('pais_postulas') }}</label>
+        <select id="pais" name="pais" required data-seleccionada=""><option value="" selected disabled>{{ t('elige_pais') }}</option></select>
+      </div>
+      <div class="campo">
+        <label for="region">{{ t('lbl_region_larga') }}</label>
+        <select id="region" name="region"><option value="" selected>{{ t('todas_regiones') }}</option></select>
+      </div>
+      <div class="campo">
+        <label for="comuna">{{ t('lbl_comuna_larga') }} <span class="campo-nota">{{ t('opcional') }}</span></label>
+        <select id="comuna" name="comuna"><option value="" selected>{{ t('todas_comunas') }}</option></select>
+        <p class="campo-nota">{{ t('afina_rastro') }}</p>
+      </div>
+
+      <div class="campo campo-check">
+        <input type="checkbox" id="alertas" name="alertas" checked>
+        <label for="alertas">{{ t('quiero_alertas', p='%g'|format(config.PREMIUM_PRICE_USD))|safe }}</label>
+      </div>
+
+      <button class="btn btn-canela btn-bloque" type="submit">{{ t('crear_mi_cuenta') }}</button>
+    </form>
+
+    <p class="panel-pie">{{ t('ya_cuenta') }} <a href="{{ url_for('auth.login') }}">{{ t('entrar') }}</a></p>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='ubicaciones.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Admin — Sabueso{% endblock %}
+
+{% macro tabla(titulo, filas) -%}
+<div class="admin-card">
+  <h2 class="admin-card-t">{{ titulo }}</h2>
+  <div class="admin-lista">
+    {% for k, n in filas %}
+    <div class="admin-row"><span>{{ k }}</span><strong>{{ n }}</strong></div>
+    {% endfor %}
+    {% if not filas %}<p class="admin-vacio">Sin datos.</p>{% endif %}
+  </div>
+</div>
+{%- endmacro %}
+
+{% block contenido %}
+<main class="contenedor zona-panel">
+  <h1 class="panel-titulo">Panel de administración</h1>
+  <p class="panel-baja">Herramienta interna de solo lectura. {{ current_user.email }}</p>
+
+  {# ---- tarjetas de totales ---- #}
+  <div class="admin-tiles">
+    <div class="admin-tile"><strong>{{ usuarios.total }}</strong><span>usuarios</span></div>
+    <div class="admin-tile"><strong>{{ usuarios.premium }}</strong><span>premium</span></div>
+    <div class="admin-tile"><strong>{{ usuarios.verificados }}</strong><span>correo verificado</span></div>
+    <div class="admin-tile"><strong>{{ fondos.total }}</strong><span>fondos ({{ fondos.vigentes }} vigentes)</span></div>
+    <div class="admin-tile"><strong>{{ fuentes.total }}</strong><span>fuentes ({{ fuentes.verificadas }} verificadas)</span></div>
+    <div class="admin-tile"><strong>{{ pagos.aprobados }}</strong><span>pagos aprobados</span></div>
+  </div>
+
+  {# ---- semáforo de cobertura ---- #}
+  <div class="admin-card">
+    <h2 class="admin-card-t">Cobertura por madurez de datos</h2>
+    <div class="cobertura-leyenda cobertura-leyenda--admin">
+      <span class="luz-item"><span class="luz luz--verde"></span>{{ cobertura.verdes }} {{ t('cob_luz_verde') }}</span>
+      <span class="luz-item"><span class="luz luz--amarillo"></span>{{ cobertura.amarillos }} {{ t('cob_luz_amarillo') }}</span>
+      <span class="luz-item"><span class="luz luz--rojo"></span>{{ cobertura.rojos }} {{ t('cob_luz_rojo') }}</span>
+    </div>
+    <p class="admin-vacio"><a href="{{ url_for('main.cobertura') }}">Ver el mapa público →</a></p>
+  </div>
+
+  {# ---- fuentes con scraper: estado de ejecución ---- #}
+  <div class="admin-card">
+    <h2 class="admin-card-t">Recolectores activos (scrapers)</h2>
+    <div class="admin-lista">
+      {% for f in fuentes.activas %}
+      <div class="admin-row admin-row--wide">
+        <span><span class="luz luz--{{ 'verde' if f.robots_ok else 'amarillo' }}"></span>{{ f.nombre }} <em>({{ f.pais }})</em></span>
+        <span class="admin-mini">{{ f.ultima_ejecucion.strftime('%d-%m %H:%M') if f.ultima_ejecucion else 'sin correr' }} · {{ f.ultimo_resultado or '—' }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="admin-grid">
+    {{ tabla('Usuarios por país', usuarios.por_pais) }}
+    {{ tabla('Fondos por país', fondos.por_pais) }}
+    {{ tabla('Fondos por fuente', fondos.por_fuente) }}
+    {{ tabla('Fuentes por método', fuentes.por_metodo) }}
+  </div>
+</main>
+{% endblock %}

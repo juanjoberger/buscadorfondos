@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="{{ idioma }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ t('titulo_sitio') }}{% endblock %}</title>
+
+  {# ---- SEO: lo que Google y las redes sociales leen de esta página ---- #}
+  <meta name="description" content="{% block descripcion %}{{ t('meta_desc') }}{% endblock %}">
+  <link rel="canonical" href="{{ request.base_url }}">
+  <link rel="alternate" hreflang="es" href="{{ request.base_url }}?lang=es">
+  <link rel="alternate" hreflang="pt-BR" href="{{ request.base_url }}?lang=pt">
+  <link rel="alternate" hreflang="x-default" href="{{ request.base_url }}">
+  <meta property="og:site_name" content="Sabueso · FundHound">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="{{ self.descripcion() }}">
+  <meta property="og:url" content="{{ request.base_url }}">
+  <meta property="og:locale" content="{{ 'pt_BR' if idioma == 'pt' else 'es_CL' }}">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+{% import "_ui.html" as ui with context %}
+
+  <header class="nav">
+    <div class="contenedor nav-inner">
+      <a class="marca" href="{{ url_for('main.index') }}" aria-label="{{ t('marca_nombre') }} — {{ t('nav_inicio') }}">
+        {{ ui.logo(38, 24, "canela") }}
+        <span class="marca-nombre">{{ t('marca_nombre') }}</span>
+      </a>
+      <nav class="nav-acciones" aria-label="{{ t('idioma_cuenta') }}">
+        {# Toggle de idioma segmentado (C7): el usuario declara su idioma #}
+        <span class="idioma">
+          <a href="?lang=es" lang="es" {% if idioma == 'es' %}aria-current="true"{% endif %}>ES</a>
+          <a href="?lang=pt" lang="pt-BR" {% if idioma == 'pt' %}aria-current="true"{% endif %}>PT</a>
+        </span>
+        {% if current_user.is_authenticated %}
+          {% if current_user.es_admin %}<a class="nav-link nav-admin" href="{{ url_for('admin.panel') }}">Admin</a>{% endif %}
+          <a class="nav-link" href="{{ url_for('auth.perfil') }}">{{ t('nav_perfil') }}</a>
+          <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ t('nav_salir') }}</a>
+        {% else %}
+          <a class="nav-link" href="{{ url_for('auth.login') }}">{{ t('nav_entrar') }}</a>
+          <a class="btn btn-canela btn-chico" href="{{ url_for('auth.registro') }}">{{ t('nav_crear') }}</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="contenedor">
+        {% for categoria, msg in messages %}
+          <p class="flash flash-{{ 'ok' if categoria == 'ok' else 'error' }}" role="{{ 'status' if categoria == 'ok' else 'alert' }}">{{ msg }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block contenido %}{% endblock %}
+
+  <footer class="pie">
+    <div class="contenedor pie-inner">
+      <span>© 2026 FundHound · Sabueso · Sabujo — {{ t('atribucion') }}</span>
+      <span><a href="{{ url_for('main.cobertura') }}">{{ t('nav_cobertura') }}</a> · <a href="mailto:{{ config.MAIL_FROM or 'hola@fundhound.lat' }}">{{ t('contacto') }}</a></span>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

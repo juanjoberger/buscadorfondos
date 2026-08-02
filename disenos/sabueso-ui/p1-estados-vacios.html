@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estados vacíos — Sabueso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- P1 · Estados vacíos (A: sin resultados · B: cobertura parcial con C10) -->
+
+<header class="nav">
+  <div class="contenedor nav-inner">
+    <a class="marca" href="p1-landing-logueado.html" aria-label="Sabueso — inicio">
+      <svg class="marca-logo" width="38" height="24" viewBox="0 0 72 44" aria-hidden="true"><ellipse cx="43" cy="21" rx="16" ry="9" fill="#D98A55"/><path d="M55 15 Q63 9 61 2 L65 3 Q66 12 58 18 Z" fill="#D98A55"/><rect x="48" y="26" width="4.5" height="15" rx="2" fill="#D98A55"/><rect x="39" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><rect x="30" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><path d="M32 15 Q24 16 17 26 L10 35 Q8 38 11 39 L16 38 Q22 33 26 28 Q31 24 34 20 Z" fill="#D98A55"/><ellipse cx="21" cy="29" rx="3.6" ry="7.5" transform="rotate(28 21 29)" fill="#F6F1E7"/><circle cx="8" cy="33" r="2" fill="#37C97E"/><circle cx="4" cy="27" r="1.7" fill="#6FC49A"/><circle cx="2" cy="20" r="1.4" fill="#B7E0CB"/></svg>
+      <span class="marca-nombre">Sabueso</span>
+    </a>
+    <nav class="nav-acciones" aria-label="Idioma y cuenta">
+      <span class="idioma"><a href="#" aria-current="true" lang="es">ES</a><a href="p1-landing-pt.html" lang="pt-BR">PT</a></span>
+      <a class="nav-link" href="p7-mi-perfil.html">Mi perfil</a>
+      <a class="nav-link" href="p1-landing.html">Cerrar sesión</a>
+    </nav>
+  </div>
+</header>
+
+<main class="contenedor">
+
+  <p class="demo-etiqueta">Estado vacío A · búsqueda sin resultados</p>
+
+  <div class="vacio">
+    <svg width="110" height="68" viewBox="0 0 72 44" aria-hidden="true"><ellipse cx="43" cy="21" rx="16" ry="9" fill="#B59F84"/><path d="M55 15 Q63 9 61 2 L65 3 Q66 12 58 18 Z" fill="#B59F84"/><rect x="48" y="26" width="4.5" height="15" rx="2" fill="#B59F84"/><rect x="39" y="27" width="4.5" height="14" rx="2" fill="#B59F84"/><rect x="30" y="27" width="4.5" height="14" rx="2" fill="#B59F84"/><path d="M32 15 Q24 16 17 26 L10 35 Q8 38 11 39 L16 38 Q22 33 26 28 Q31 24 34 20 Z" fill="#B59F84"/><ellipse cx="21" cy="29" rx="3.6" ry="7.5" transform="rotate(28 21 29)" fill="#D98A55"/></svg>
+    <h2 class="vacio-titulo">El sabueso no encontró nada con "drones agrícolas"</h2>
+    <p class="vacio-baja">El rastro está frío por ahora. Prueba ampliando la búsqueda — los fondos cambian todas las semanas.</p>
+    <ul class="vacio-sugerencias">
+      <li><span>Quita alguna palabra o usa un término más general.</span></li>
+      <li><span>Cambia el filtro a <strong>Todas</strong> para incluir próximas aperturas.</span></li>
+      <li><span>Prueba con <strong>Todos los ámbitos</strong> o sin comuna.</span></li>
+    </ul>
+    <a class="btn btn-borde" href="p1-landing-logueado.html">Limpiar filtros</a>
+  </div>
+
+  <p class="demo-etiqueta">Estado vacío B · país con cobertura parcial (ej.: Perú) — con aviso C10</p>
+
+  <!-- C10 · aviso de cobertura: honesto, no alarmista -->
+  <aside class="aviso-cobertura">
+    <div>
+      <strong>La cobertura de Perú está en desarrollo</strong>
+      <p>Tenemos fuentes identificadas pero aún sin verificar. Te mostramos lo comprobado y los fondos de LATAM que sí aplican. <a href="p10-cobertura.html">Ver mapa de cobertura</a></p>
+    </div>
+  </aside>
+
+  <div class="zona-resultados">
+    <div class="grupos">
+      <p class="grupo-vacio"><strong>Tu país · Perú:</strong> aún no hay fondos nacionales verificados — seguimos sumando fuentes. Estos fondos de Latinoamérica aplican para ti:</p>
+      <section>
+        <h3 class="grupo-titulo"><span class="n4">Latinoamérica</span> <span class="grupo-sub">aplican en Perú</span></h3>
+        <div class="grupo-lista grupo-lista--multi">
+          <article class="tarjeta">
+            <div class="tarjeta-franja franja--latam"><span>Latinoamérica</span><span class="franja-estado">Permanente</span></div>
+            <div class="tarjeta-cuerpo">
+              <h4 class="tarjeta-nombre"><a href="p2-detalle.html">Fondo de Innovación BID Lab</a></h4>
+              <p class="tarjeta-inst">Banco Interamericano de Desarrollo · Emprendimiento</p>
+              <p class="tarjeta-monto">Según convocatoria</p>
+              <a class="btn-detalle" href="p2-detalle.html">Ver detalle</a>
+            </div>
+          </article>
+        </div>
+      </section>
+      <aside class="aviso-premium">
+        <div>
+          <strong>Te avisamos apenas haya más</strong>
+          <p>Activa las alertas y sabrás cuando verifiquemos fuentes de Perú.</p>
+        </div>
+        <a class="btn btn-canela" href="p8-premium.html">Activar alertas · USD 3/mes</a>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="contenedor pie-inner">
+    <span>© 2026 FundHound — Sabueso · Sabujo</span>
+    <span><a href="p10-cobertura.html">Mapa de cobertura</a> · <a href="#">Contacto</a> · <a href="#">Términos</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

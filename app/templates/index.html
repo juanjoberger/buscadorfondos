@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+
+{% block contenido %}
+
+{% if not current_user.is_authenticated %}
+<section class="hero">
+  <div class="contenedor hero-grid">
+    <div>
+      <h1>{{ t('hero_h1') }}</h1>
+      <p class="hero-baja">{{ t('hero_baja', sitios=stats.total_sitios) }}</p>
+      <div class="pasos">
+        <p class="paso"><span class="paso-n">1</span><span>{{ t('paso1')|safe }}</span></p>
+        <p class="paso"><span class="paso-n">2</span><span>{{ t('paso2', p='%g'|format(config.PREMIUM_PRICE_USD))|safe }}</span></p>
+        <p class="paso"><span class="paso-n">3</span><span>{{ t('paso3')|safe }}</span></p>
+      </div>
+      <div class="hero-cta">
+        <a class="btn btn-canela" href="{{ url_for('auth.registro') }}">{{ t('crear_cuenta_gratis') }}</a>
+        <span class="hero-nota">{{ t('hero_nota_corta') }}</span>
+      </div>
+      {# Franja con el tamaño REAL de la base (§ math): total, vigentes, países #}
+      <div class="hero-datos">
+        <p class="dato"><strong>{{ stats.total_db }}</strong>{{ t('dato_total') }}</p>
+        <p class="dato"><strong>{{ stats.vivas }}</strong>{{ t('dato_vivas_corto') }}</p>
+        <p class="dato"><strong>{{ stats.paises }}</strong>{{ t('dato_paises') }}</p>
+      </div>
+      {% if stats.cierran_semana %}
+      <p class="hero-urgencia">{{ t('dato_semana', n=stats.cierran_semana) }}</p>
+      {% endif %}
+    </div>
+    <div class="hero-figura">{{ ui.logo(300, 185, "canela") }}</div>
+  </div>
+</section>
+{% endif %}
+
+{# ---- Buscador (C2/C3): mismo formulario para anónimo y logueado ---- #}
+<div class="zona-buscador">
+  <form class="contenedor buscador" action="{{ url_for('main.index') }}" method="get" aria-label="{{ t('buscar_fondos') }}">
+    <div class="campo-buscar">
+      <label class="visualmente-oculto" for="q">{{ t('buscar_label') }}</label>
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#9B8B75" stroke-width="2"/><path d="M11 11l3.5 3.5" stroke="#9B8B75" stroke-width="2"/></svg>
+      <input type="search" id="q" name="q" value="{{ filtros.q }}" placeholder="{{ t('buscar_placeholder') }}">
+    </div>
+    <div class="campos-selects">
+      <div class="mini-campo">
+        <label for="perfil">{{ t('lbl_ambito') }}</label>
+        <select id="perfil" name="perfil">
+          <option value="">{{ t('todos_ambitos') }}</option>
+          {% for clave, nombre in PERFILES.items() %}
+            <option value="{{ clave }}" {% if filtros.perfil == clave %}selected{% endif %}>{{ nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mini-campo">
+        <label for="pais">{{ t('lbl_pais') }}</label>
+        <select id="pais" name="pais" data-seleccionada="{{ filtros.pais }}"><option value="">{{ t('todos_paises') }}</option></select>
+      </div>
+      <div class="mini-campo">
+        <label for="region">{{ t('lbl_region') }}</label>
+        <select id="region" name="region" data-seleccionada="{{ filtros.region }}"><option value="">{{ t('todas_regiones') }}</option></select>
+      </div>
+      <div class="mini-campo">
+        <label for="comuna">{{ t('lbl_comuna') }}</label>
+        <select id="comuna" name="comuna" data-seleccionada="{{ filtros.comuna }}"><option value="">{{ t('todas_comunas') }}</option></select>
+      </div>
+    </div>
+    <div class="buscador-pie">
+      <nav class="chips" aria-label="{{ t('filtrar_estado') }}">
+        {% for valor, clave in [('abiertas','chip_abiertas'), ('proximas','chip_proximas'), ('todas','chip_todas'), ('cerradas','chip_cerradas')] %}
+          <a class="chip" {% if filtros.estado == valor %}aria-current="true"{% endif %}
+             href="{{ url_for('main.index', q=filtros.q, pais=filtros.pais, perfil=filtros.perfil, region=filtros.region, comuna=filtros.comuna, estado=valor) }}">{{ t(clave) }}</a>
+        {% endfor %}
+      </nav>
+      <button class="btn btn-canela btn-chico" type="submit">{{ t('buscar_fondos') }}</button>
+    </div>
+  </form>
+</div>
+
+<main class="contenedor zona-resultados">
+
+  {# Aviso honesto si el país buscado no tiene cobertura verificada (Ley II) #}
+  {% if cobertura_pais and cobertura_pais.estado != 'verde' %}
+  <aside class="aviso-cobertura">
+    <div>
+      <strong>{{ t('aviso_cob_' + cobertura_pais.estado + '_t', pais=cobertura_pais.pais) }}</strong>
+      <p>{{ t('aviso_cob_' + cobertura_pais.estado, pais=cobertura_pais.pais) }} <a href="{{ url_for('main.cobertura') }}">{{ t('aviso_cob_ver_mapa') }}</a></p>
+    </div>
+  </aside>
+  {% endif %}
+
+  {% if grupos %}
+  <div class="resultados-cabeza">
+    <h2>{{ t('cerca_de_ti') }}</h2>
+    <span class="resultados-orden">{% if current_user.is_authenticated and total %}{{ total }} {{ t('fondos_s') if total != 1 else t('fondo_s') }} · {% endif %}{{ t('orden_local_global') }}</span>
+  </div>
+  <div class="escala-barra" role="img" aria-label="{{ t('escala_aria') }}"><span class="s1"></span><span class="s2"></span><span class="s3"></span><span class="s4"></span><span class="s5"></span></div>
+
+  <div class="grupos">
+    {% for grupo in grupos %}
+      {% if grupo.fondos %}
+      <section>
+        <h3 class="grupo-titulo"><span class="n{{ grupo.nivel + 1 }}">{{ grupo.titulo }}</span>{% if grupo.sub or grupo.fondos %} <span class="grupo-sub">{{ grupo.sub }}{% if grupo.fondos %}{% if grupo.sub %} · {% endif %}{{ grupo.fondos|length }} {{ t('fondos_s') if grupo.fondos|length != 1 else t('fondo_s') }}{% endif %}</span>{% endif %}</h3>
+        <div class="grupo-lista grupo-lista--multi">
+          {% for fondo in grupo.fondos %}{{ ui.tarjeta(fondo) }}{% endfor %}
+        </div>
+      </section>
+      {% else %}
+      <p class="grupo-vacio"><strong>{{ grupo.titulo }}{% if grupo.sub %} · {{ grupo.sub }}{% endif %}:</strong> {{ grupo.vacio }}</p>
+      {% endif %}
+    {% endfor %}
+
+    {% if bloqueados > 0 %}
+    {# C4 · muro con adelanto de los fondos ocultos (solo nombre + nivel) #}
+    <aside class="muro">
+      <h2 class="muro-titulo">{{ t('muro_titulo_sabueso', n=bloqueados) }}</h2>
+      {% if teaser %}
+      <div class="adelanto">
+        {% for nombre, alcance in teaser %}
+        <p class="adelanto-item"><span>{{ nombre }}</span><span class="nivel-mini nivel-mini--{{ ['local','regional','nacional','latam','global'][alcance] }}">{{ [t('nv_local'), t('nv_regional'), t('nv_nacional'), t('nv_latam'), t('nv_global')][alcance] }}</span></p>
+        {% endfor %}
+        {% if bloqueados > teaser|length %}<p class="adelanto-mas">{{ t('adelanto_mas', n=bloqueados - teaser|length) }}</p>{% endif %}
+      </div>
+      {% endif %}
+      <p class="muro-candado">{{ t('muro_candado') }}</p>
+      <a class="btn btn-cafe btn-bloque" href="{{ url_for('auth.registro') }}">{{ t('crear_cuenta_gratis') }}</a>
+      <p class="muro-nota">{{ t('ya_cuenta') }} <a href="{{ url_for('auth.login') }}">{{ t('nav_entrar') }}</a></p>
+    </aside>
+    {% elif current_user.is_authenticated %}
+      {% if paginas > 1 %}
+      {# C9 · avanzar de página = alejarse en el embudo #}
+      <nav class="paginacion" aria-label="{{ t('pag_actual', n=pagina, total=paginas) }}">
+        {% if pagina > 1 %}<a href="{{ url_for('main.index', q=filtros.q, pais=filtros.pais, perfil=filtros.perfil, region=filtros.region, comuna=filtros.comuna, estado=filtros.estado, pagina=pagina-1) }}">{{ t('pag_anterior') }}<span>{{ t('pag_anterior_sub') }}</span></a>{% else %}<a aria-disabled="true">{{ t('pag_anterior') }}<span>{{ t('pag_tope_local') }}</span></a>{% endif %}
+        <p class="pag-estado">{{ t('pag_actual', n=pagina, total=paginas) }} · {{ total }} {{ t('fondos_s') }}</p>
+        {% if pagina < paginas %}<a class="pag-derecha" href="{{ url_for('main.index', q=filtros.q, pais=filtros.pais, perfil=filtros.perfil, region=filtros.region, comuna=filtros.comuna, estado=filtros.estado, pagina=pagina+1) }}">{{ t('pag_siguiente') }}<span>{{ t('pag_siguiente_sub') }}</span></a>{% else %}<a class="pag-derecha" aria-disabled="true">{{ t('pag_siguiente') }}<span>—</span></a>{% endif %}
+      </nav>
+      {% endif %}
+      {% if not current_user.premium_activo %}
+      <aside class="aviso-premium">
+        <div>
+          <strong>{{ t('aviso_titulo') }}</strong>
+          <p>{{ t('aviso_baja') }}</p>
+        </div>
+        <a class="btn btn-canela" href="{{ url_for('billing.premium') }}">{{ t('activar_alertas_precio', p='%g'|format(config.PREMIUM_PRICE_USD)) }}</a>
+      </aside>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  {% else %}
+  {# Estado vacío: el rastro está frío #}
+  <div class="vacio">
+    {{ ui.logo(110, 68, "gris") }}
+    <h2 class="vacio-titulo">{{ t('vacio_titulo_sabueso', q=filtros.q) if filtros.q else t('vacio_titulo_generico') }}</h2>
+    <p class="vacio-baja">{{ t('vacio_baja') }}</p>
+    <ul class="vacio-sugerencias">
+      <li><span>{{ t('vacio_sug1') }}</span></li>
+      <li><span>{{ t('vacio_sug2')|safe }}</span></li>
+      <li><span>{{ t('vacio_sug3')|safe }}</span></li>
+    </ul>
+    <a class="btn btn-borde" href="{{ url_for('main.index') }}">{{ t('limpiar_filtros') }}</a>
+  </div>
+  {% endif %}
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='ubicaciones.js') }}"></script>
+{% endblock %}

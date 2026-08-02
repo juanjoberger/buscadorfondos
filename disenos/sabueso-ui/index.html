@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrega UI — Sabueso · Sabujo · FundHound</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="contenedor nav-inner">
+    <span class="marca">
+      <svg class="marca-logo" width="38" height="24" viewBox="0 0 72 44" aria-hidden="true"><ellipse cx="43" cy="21" rx="16" ry="9" fill="#D98A55"/><path d="M55 15 Q63 9 61 2 L65 3 Q66 12 58 18 Z" fill="#D98A55"/><rect x="48" y="26" width="4.5" height="15" rx="2" fill="#D98A55"/><rect x="39" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><rect x="30" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><path d="M32 15 Q24 16 17 26 L10 35 Q8 38 11 39 L16 38 Q22 33 26 28 Q31 24 34 20 Z" fill="#D98A55"/><ellipse cx="21" cy="29" rx="3.6" ry="7.5" transform="rotate(28 21 29)" fill="#F6F1E7"/><circle cx="8" cy="33" r="2" fill="#37C97E"/><circle cx="4" cy="27" r="1.7" fill="#6FC49A"/><circle cx="2" cy="20" r="1.4" fill="#B7E0CB"/></svg>
+      <span class="marca-nombre">Sabueso · entrega UI</span>
+    </span>
+  </div>
+</header>
+
+<main class="contenedor zona-panel">
+  <div class="panel panel--ancho">
+    <h1 class="panel-titulo">Índice de la entrega</h1>
+    <p class="panel-baja">Dirección "Rastro Pleno": café + canela + crema, Anton + IBM Plex Sans. HTML + CSS estáticos, sin frameworks, <strong>sin estilos inline</strong> (compatible con CSP). Todo comparte <strong>styles.css</strong> con tokens al inicio. Los correos son la excepción obligada (tablas + inline, máx 600px, sin webfonts).</p>
+
+    <p class="form-titulo">Páginas</p>
+    <ul class="vacio-sugerencias">
+      <li><span><a href="p1-landing.html">p1-landing</a> — visitante anónimo: hero, datos reales, buscador, muro con adelanto</span></li>
+      <li><span><a href="p1-landing-pt.html">p1-landing-pt</a> — misma página en portugués (Sabujo, editais brasileños)</span></li>
+      <li><span><a href="p1-landing-logueado.html">p1-landing-logueado</a> — buscador directo + paginación del embudo (C9)</span></li>
+      <li><span><a href="p1-estados-vacios.html">p1-estados-vacios</a> — sin resultados / cobertura parcial con aviso C10</span></li>
+      <li><span><a href="p2-detalle.html">p2-detalle</a> — detalle con urgencia y fuente verificada</span></li>
+      <li><span><a href="p3-registro.html">p3-registro</a> — conversión + casillas multi-ámbito (C11)</span></li>
+      <li><span><a href="p4-login.html">p4-login</a> — con flash de error</span></li>
+      <li><span><a href="p5-recuperar.html">p5-recuperar</a> · <a href="p6-reset.html">p6-reset</a></span></li>
+      <li><span><a href="p7-mi-perfil.html">p7-mi-perfil</a> — checklist C5 + las 3 variantes de estado premium</span></li>
+      <li><span><a href="p8-premium.html">p8-premium</a> — un plan, un botón, nota honesta de cobertura</span></li>
+      <li><span><a href="p9-baja.html">p9-baja</a> — baja de alertas</span></li>
+      <li><span><a href="p10-cobertura.html">p10-cobertura</a> — semáforo por país (C8) + manifiesto</span></li>
+      <li><span><a href="p11-errores.html">p11-errores</a> — 404, 500 y enlace vencido</span></li>
+    </ul>
+
+    <p class="form-titulo">Correos</p>
+    <ul class="vacio-sugerencias">
+      <li><span><a href="e1-alerta.html">e1-alerta</a> — fondos nuevos, orden local → global</span></li>
+      <li><span><a href="e2-recordatorio.html">e2-recordatorio</a> — cierres próximos</span></li>
+      <li><span><a href="e3-verificacion.html">e3-verificacion</a> · <a href="e4-recuperar.html">e4-recuperar</a> — un botón cada uno</span></li>
+    </ul>
+
+    <p class="form-titulo">Notas para integración</p>
+    <ul class="vacio-sugerencias">
+      <li><span>Marca: símbolo fijo (sabueso olfateando, rastro = degradé local→global) + palabra que cambia con el idioma. FundHound para dominio e internacional.</span></li>
+      <li><span>Semáforo de cobertura: forma + etiqueta de texto, nunca solo color (círculo lleno / rombo / anillo).</span></li>
+      <li><span>Cifras 423 / 23 / 19 / 67 fuentes son de muestra: inyectar valores reales.</span></li>
+      <li><span>Campos conservados: email, password, ambitos[] (multi), pais, region, comuna, alertas.</span></li>
+      <li><span>Clases clave: <code>.franja--local…--global</code>, <code>.estado--*</code>, <code>.pill-urgente</code>, <code>.luz--verde/amarilla/roja</code>.</span></li>
+      <li><span>Toggle ES/PT: <code>.idioma</code> en el nav, con <code>aria-current</code> en el activo.</span></li>
+    </ul>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="contenedor pie-inner">
+    <span>© 2026 FundHound — Sabueso · Sabujo</span>
+    <span>Entrega de diseño · agosto 2026</span>
+  </div>
+</footer>
+
+</body>
+</html>

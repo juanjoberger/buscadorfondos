@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ t('recupera') }} — Sabueso{% endblock %}
+
+{% block contenido %}
+<main class="contenedor zona-panel">
+  <div class="panel">
+    <div class="panel-cabeza">
+      <h1 class="panel-titulo">{{ t('recupera') }}</h1>
+      <p class="panel-baja">{{ t('recupera_baja') }}</p>
+    </div>
+    <form action="{{ url_for('auth.recuperar') }}" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="campo">
+        <label for="email">{{ t('correo') }}</label>
+        <input type="email" id="email" name="email" autocomplete="email" required placeholder="tu@correo.com">
+      </div>
+      <button class="btn btn-canela btn-bloque" type="submit">{{ t('enviame_enlace') }}</button>
+    </form>
+    <p class="panel-pie"><a href="{{ url_for('auth.login') }}">{{ t('volver_entrar') }}</a></p>
+  </div>
+</main>
+{% endblock %}

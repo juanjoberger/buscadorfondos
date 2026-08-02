@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav_cobertura') }} — Sabueso{% endblock %}
+{% block descripcion %}{{ t('meta_desc_cobertura') }}{% endblock %}
+
+{# La luz del backend ("verde"/"amarillo"/"rojo") → clase CSS del diseño y etiqueta.
+   Los datos son REALES (services/cobertura.py): nada de números inventados. #}
+{% set LUZ_CSS = {"verde": "verde", "amarillo": "amarilla", "rojo": "roja"} %}
+
+{% block contenido %}
+<main class="contenedor">
+
+  <div class="cobertura-cabeza">
+    <h1>{{ t('cob_titulo') }}</h1>
+    <p class="cobertura-resumen">{{ t('cob_resumen', verdes=verdes, amarillos=amarillos, rojos=rojos) }}</p>
+    <p class="cobertura-nota">{{ t('cob_sitios_resumen', sitios=total_sitios) }}</p>
+  </div>
+
+  <div class="semaforo-leyenda">
+    <span><span class="luz luz--verde" aria-hidden="true"></span> <strong>{{ t('cob_luz_verde') }}</strong> — {{ t('cob_luz_verde_desc') }}</span>
+    <span><span class="luz luz--amarilla" aria-hidden="true"></span> <strong>{{ t('cob_luz_amarillo') }}</strong> — {{ t('cob_luz_amarillo_desc') }}</span>
+    <span><span class="luz luz--roja" aria-hidden="true"></span> <strong>{{ t('cob_luz_rojo') }}</strong> — {{ t('cob_luz_rojo_desc') }}</span>
+  </div>
+
+  <ul class="semaforo">
+    {% for r in paises %}
+    <li{% if r.luz == 'verde' %} class="destacado"{% endif %}>
+      <span class="rango">{{ '%02d'|format(r.rank) }}</span>
+      <span class="pais"><span class="luz luz--{{ LUZ_CSS[r.luz] }}" aria-hidden="true"></span> {{ r.pais }}</span>
+      <span class="stats">{{ t('cob_fila_stats', sitios=r.sitios, fondos=r.fondos, usd=fmt_usd(r.usd)) }}</span>
+      <span class="luz-tag luz-tag--{{ LUZ_CSS[r.luz] }}">{{ t('cob_luz_' + r.luz) }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <div class="manifiesto">
+    <section class="manifiesto-bloque"><h2>{{ t('mani_si_t') }}</h2><p>{{ t('mani_si') }}</p></section>
+    <section class="manifiesto-bloque"><h2>{{ t('mani_no_t') }}</h2><p>{{ t('mani_no') }}</p></section>
+    <section class="manifiesto-bloque"><h2>{{ t('mani_datos_t') }}</h2><p>{{ t('mani_datos') }}</p></section>
+    <section class="manifiesto-bloque"><h2>{{ t('mani_error_t') }}</h2><p>{{ t('mani_error') }}</p></section>
+  </div>
+
+  <aside class="manifiesto-cta">
+    <h2>{{ t('cob_invitacion_t') }}</h2>
+    <p>{{ t('cob_invitacion') }}</p>
+    <a class="btn btn-cafe" href="mailto:{{ config.MAIL_FROM or 'hola@fundhound.lat' }}">{{ t('cob_invitacion_btn') }}</a>
+  </aside>
+</main>
+{% endblock %}

@@ -1,0 +1,76 @@
+{# Piezas de UI reutilizables del sistema de diseño Sabueso · Sabujo · FundHound.
+   La lógica (t(), url_for, condiciones) vive aquí una sola vez; las páginas la
+   componen. Así, si cambia la forma de una tarjeta, se cambia en un solo lugar. #}
+
+{# ---- Logo del sabueso (perro rastreador + rastro de olfato en verde) ----
+   Tres variantes de color según el fondo donde va:
+   · canela → sobre el café oscuro del nav
+   · cafe   → sobre paneles claros (cabeceras de formulario)
+   · gris   → apagado, para errores y estados vacíos #}
+{% macro logo(w=38, h=24, variante="canela") -%}
+{% set cuerpo = {"canela": "#D98A55", "cafe": "#2B1D10", "gris": "#B59F84"}[variante] %}
+{% set oreja = {"canela": "#F6F1E7", "cafe": "#D98A55", "gris": "#D98A55"}[variante] %}
+<svg class="marca-logo" width="{{ w }}" height="{{ h }}" viewBox="0 0 72 44" aria-hidden="true"><ellipse cx="43" cy="21" rx="16" ry="9" fill="{{ cuerpo }}"/><path d="M55 15 Q63 9 61 2 L65 3 Q66 12 58 18 Z" fill="{{ cuerpo }}"/><rect x="48" y="26" width="4.5" height="15" rx="2" fill="{{ cuerpo }}"/><rect x="39" y="27" width="4.5" height="14" rx="2" fill="{{ cuerpo }}"/><rect x="30" y="27" width="4.5" height="14" rx="2" fill="{{ cuerpo }}"/><path d="M32 15 Q24 16 17 26 L10 35 Q8 38 11 39 L16 38 Q22 33 26 28 Q31 24 34 20 Z" fill="{{ cuerpo }}"/><ellipse cx="21" cy="29" rx="3.6" ry="7.5" transform="rotate(28 21 29)" fill="{{ oreja }}"/>{% if variante != "gris" %}<circle cx="8" cy="33" r="2" fill="#37C97E"/><circle cx="4" cy="27" r="1.7" fill="#6FC49A"/><circle cx="2" cy="20" r="1.4" fill="#B7E0CB"/>{% endif %}</svg>
+{%- endmacro %}
+
+{# Nombre de la escala de cercanía (0 local … 4 global) → clase CSS del nivel #}
+{% set NIVEL_CLASE = ["local", "regional", "nacional", "latam", "global"] %}
+
+{# ---- La franja superior de la tarjeta: nivel a la izquierda, estado a la derecha ----
+   El estado se calcula con las fechas (nunca se guarda), y si cierra en ≤10 días
+   sale como "pill" urgente. #}
+{% macro franja(fondo) -%}
+<div class="tarjeta-franja franja--{{ NIVEL_CLASE[fondo.alcance] }}">
+  <span>{% if fondo.alcance <= 2 %}{{ [t('nv_local'), t('nv_regional'), t('nv_nacional')][fondo.alcance] }} · {{ fondo.pais }}{% elif fondo.alcance == 3 %}{{ t('g_latam') }}{% else %}{{ t('nv_global') }}{% endif %}</span>
+  {% if fondo.estado == 'abierta' and fondo.dias_para_cierre is not none and fondo.dias_para_cierre <= 10 %}
+    <span class="pill-urgente">{{ t('cierra_en', n=fondo.dias_para_cierre, s='s' if fondo.dias_para_cierre != 1 else '') }}</span>
+  {% elif fondo.estado == 'abierta' %}
+    <span class="franja-estado">{{ t('cierra_el', f=fondo.fecha_cierre.strftime('%d-%m-%Y')) }}</span>
+  {% elif fondo.estado == 'proxima' %}
+    <span class="franja-estado">{{ t('abre_el_corto', f=fondo.fecha_apertura.strftime('%d-%m-%Y')) }}</span>
+  {% elif fondo.estado == 'permanente' %}
+    <span class="franja-estado">{{ t('permanente_corto') }}</span>
+  {% elif fondo.fecha_cierre %}
+    <span class="franja-estado">{{ t('cerro_el', f=fondo.fecha_cierre.strftime('%d-%m-%Y')) }}</span>
+  {% else %}
+    <span class="franja-estado">{{ t('cerrada') }}</span>
+  {% endif %}
+</div>
+{%- endmacro %}
+
+{# Ubicación legible de un fondo (comuna, región, país o alcance supranacional) #}
+{% macro ubicacion_texto(fondo) -%}
+  {%- if fondo.alcance <= 2 %}{% if fondo.comuna != 'Todas' %}{{ fondo.comuna }}, {% endif %}{% if fondo.region != 'Todas' %}{{ fondo.region }}, {% endif %}{{ fondo.pais }}
+  {%- elif fondo.alcance == 3 %}{{ t('america_latina') }}
+  {%- else %}{{ t('todo_el_mundo') }}{% endif %}
+{%- endmacro %}
+
+{# ---- C1 · Tarjeta de fondo (el componente más importante del producto) ---- #}
+{% macro tarjeta(fondo) -%}
+<article class="tarjeta{% if fondo.estado == 'cerrada' %} tarjeta--cerrada{% endif %}">
+  {{ franja(fondo) }}
+  <div class="tarjeta-cuerpo">
+    <h4 class="tarjeta-nombre"><a href="{{ url_for('main.fondo_detalle', fondo_id=fondo.id) }}">{{ fondo.nombre }}</a></h4>
+    <p class="tarjeta-inst">{% if fondo.institucion %}{{ fondo.institucion }} · {% endif %}{{ PERFILES.get(fondo.perfil, fondo.perfil) }}{% if fondo.alcance <= 2 %} · {{ fondo.pais }}{% endif %}</p>
+    {% if fondo.monto_texto %}<p class="tarjeta-monto">{{ fondo.monto_texto.rsplit(' ', 1)[0] }} <small>{{ fondo.moneda }}</small></p>{% endif %}
+    <a class="btn-detalle" href="{{ url_for('main.fondo_detalle', fondo_id=fondo.id) }}">{{ t('ver_detalle') }}</a>
+  </div>
+</article>
+{%- endmacro %}
+
+{# Casillas multi-ámbito (C11). Mantiene name="perfil" porque es lo que el backend
+   lee (getlist); el diseño las llamaba "ambitos" pero manda la lógica. #}
+{% macro ambitos_checkboxes(seleccionados) -%}
+<fieldset class="campo">
+  <legend class="visualmente-oculto">{{ t('perfil_proyecto') }}</legend>
+  <div class="ambitos">
+    {% for clave, nombre in PERFILES.items() %}
+    <label class="ambito{% if clave == 'cultura' %} ambito--ancho{% endif %}">
+      <input type="checkbox" name="perfil" value="{{ clave }}" {% if clave in seleccionados %}checked{% endif %}>
+      <span>{{ nombre }}</span>
+    </label>
+    {% endfor %}
+  </div>
+  <p class="campo-nota">{{ t('multi_ambito_nota') }}</p>
+</fieldset>
+{%- endmacro %}

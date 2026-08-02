@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nueva contraseña — Sabueso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- P6 · Nueva contraseña (desde enlace con token) -->
+
+<header class="nav">
+  <div class="contenedor nav-inner">
+    <a class="marca" href="p1-landing.html" aria-label="Sabueso — inicio">
+      <svg class="marca-logo" width="38" height="24" viewBox="0 0 72 44" aria-hidden="true"><ellipse cx="43" cy="21" rx="16" ry="9" fill="#D98A55"/><path d="M55 15 Q63 9 61 2 L65 3 Q66 12 58 18 Z" fill="#D98A55"/><rect x="48" y="26" width="4.5" height="15" rx="2" fill="#D98A55"/><rect x="39" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><rect x="30" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><path d="M32 15 Q24 16 17 26 L10 35 Q8 38 11 39 L16 38 Q22 33 26 28 Q31 24 34 20 Z" fill="#D98A55"/><ellipse cx="21" cy="29" rx="3.6" ry="7.5" transform="rotate(28 21 29)" fill="#F6F1E7"/><circle cx="8" cy="33" r="2" fill="#37C97E"/><circle cx="4" cy="27" r="1.7" fill="#6FC49A"/><circle cx="2" cy="20" r="1.4" fill="#B7E0CB"/></svg>
+      <span class="marca-nombre">Sabueso</span>
+    </a>
+  </div>
+</header>
+
+<main class="contenedor zona-panel">
+  <div class="panel">
+    <div class="panel-cabeza">
+      <h1 class="panel-titulo">Crea una nueva contraseña</h1>
+      <p class="panel-baja">Será tu contraseña desde ahora, para <strong>isidora@cultura-rancagua.cl</strong>.</p>
+    </div>
+    <form action="/reset" method="post">
+      <div class="campo">
+        <label for="password">Nueva contraseña</label>
+        <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
+        <p class="campo-nota">Mínimo 8 caracteres. Evita usar la anterior.</p>
+      </div>
+      <button class="btn btn-canela btn-bloque" type="submit">Guardar y entrar</button>
+    </form>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="contenedor pie-inner">
+    <span>© 2026 FundHound — Sabueso · Sabujo</span>
+    <span><a href="p10-cobertura.html">Mapa de cobertura</a> · <a href="#">Contacto</a> · <a href="#">Términos</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

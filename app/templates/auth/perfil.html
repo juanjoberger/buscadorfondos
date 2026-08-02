@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ t('mi_perfil') }} — Sabueso{% endblock %}
+
+{% block contenido %}
+<main class="contenedor zona-panel">
+  <div class="panel panel--ancho">
+    <h1 class="panel-titulo">{{ t('mi_perfil') }}</h1>
+    <p class="panel-baja">{{ current_user.email }}</p>
+
+    {# ---- (a) C5 · checklist del perfil de búsqueda ---- #}
+    <p class="form-titulo">{{ t('estado_perfil') }}</p>
+    <div class="checklist">
+      <div class="check-item">
+        {% if current_user.perfiles %}
+          <span class="check-icono check-icono--ok" aria-hidden="true">✓</span>
+          <div class="check-cuerpo"><strong>{{ t('chk_ambitos_ok') }}</strong><span>{% for p in current_user.perfiles %}{{ PERFILES.get(p) }}{% if not loop.last %} + {% endif %}{% endfor %}</span></div>
+        {% else %}
+          <span class="check-icono check-icono--pendiente" aria-hidden="true">!</span>
+          <div class="check-cuerpo"><strong>{{ t('chk_perfil_pend') }}</strong><span>{{ t('chk_eligelo') }}</span></div>
+        {% endif %}
+      </div>
+      <div class="check-item">
+        {% if current_user.pais_interes %}
+          <span class="check-icono check-icono--ok" aria-hidden="true">✓</span>
+          <div class="check-cuerpo"><strong>{{ t('chk_localidad_ok') }}</strong><span>{% if current_user.comuna_interes %}{{ current_user.comuna_interes }}, {% endif %}{% if current_user.region_interes %}{{ current_user.region_interes }}, {% endif %}{{ current_user.pais_interes }}</span></div>
+        {% else %}
+          <span class="check-icono check-icono--pendiente" aria-hidden="true">!</span>
+          <div class="check-cuerpo"><strong>{{ t('chk_localidad_pend') }}</strong><span>{{ t('chk_declarala') }}</span></div>
+        {% endif %}
+      </div>
+      <div class="check-item">
+        {% if current_user.email_verificado %}
+          <span class="check-icono check-icono--ok" aria-hidden="true">✓</span>
+          <div class="check-cuerpo"><strong>{{ t('chk_correo_ok') }}</strong><span>{{ current_user.email }}</span></div>
+        {% else %}
+          <span class="check-icono check-icono--pendiente" aria-hidden="true">!</span>
+          <div class="check-cuerpo"><strong>{{ t('chk_correo_pend') }}</strong><span>{{ t('chk_enlace') }}</span></div>
+          <span class="check-accion">
+            <form method="POST" action="{{ url_for('auth.reenviar_verificacion') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-borde btn-chico">{{ t('reenviar_correo') }}</button>
+            </form>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ---- (b) línea de estado premium: activa / inactiva / bloqueada ---- #}
+    {% if current_user.premium_activo %}
+    <div class="premium-linea premium-linea--activa">
+      <div><strong>{{ t('alertas_activas', hasta=t('hasta_el', f=current_user.premium_hasta.strftime('%d-%m-%Y')) if current_user.premium_hasta else '') }}</strong><p>{{ t('aviso_baja') }}</p></div>
+      <a class="btn btn-borde btn-chico" href="{{ url_for('billing.premium') }}">{{ t('renovar') }}</a>
+    </div>
+    {% elif current_user.perfil_valido %}
+    <div class="premium-linea">
+      <div><strong>{{ t('alertas_inactivas') }}</strong><p>{{ t('aviso_baja') }}</p></div>
+      <a class="btn btn-canela btn-chico" href="{{ url_for('billing.premium') }}">{{ t('activar_por', p='%g'|format(config.PREMIUM_PRICE_USD)) }}</a>
+    </div>
+    {% else %}
+    <div class="premium-linea premium-linea--bloqueada">
+      <div><strong>{{ t('alertas_bloqueadas') }}</strong><p>{{ t('completa_checklist') }}</p></div>
+      <span class="btn btn-chico btn-deshabilitado" aria-disabled="true">{{ t('activar_por', p='%g'|format(config.PREMIUM_PRICE_USD)) }}</span>
+    </div>
+    {% endif %}
+
+    {# ---- (c) edición del perfil de búsqueda ---- #}
+    <p class="form-titulo">{{ t('editar_perfil_busqueda') }}</p>
+    <form method="POST" action="{{ url_for('auth.perfil') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{ ui.ambitos_checkboxes(current_user.perfiles) }}
+      <div class="campo">
+        <label for="pais">{{ t('pais_postulas') }}</label>
+        <select id="pais" name="pais" data-seleccionada="{{ current_user.pais_interes or 'Chile' }}"></select>
+      </div>
+      <div class="campo">
+        <label for="region">{{ t('lbl_region_larga') }}</label>
+        <select id="region" name="region" data-seleccionada="{{ current_user.region_interes or '' }}"><option value="">{{ t('todas_regiones') }}</option></select>
+      </div>
+      <div class="campo">
+        <label for="comuna">{{ t('lbl_comuna_larga') }} <span class="campo-nota">{{ t('opcional') }}</span></label>
+        <select id="comuna" name="comuna" data-seleccionada="{{ current_user.comuna_interes or '' }}"><option value="">{{ t('todas_comunas') }}</option></select>
+        <p class="campo-nota">{{ t('afina_rastro') }}</p>
+      </div>
+      <div class="campo campo-check">
+        <input type="checkbox" id="alertas" name="alertas" {% if current_user.recibir_alertas %}checked{% endif %}>
+        <label for="alertas">{{ t('mantener_alertas')|safe }}</label>
+      </div>
+      <button type="submit" class="btn btn-canela btn-bloque">{{ t('guardar_cambios') }}</button>
+    </form>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='ubicaciones.js') }}"></script>
+{% endblock %}

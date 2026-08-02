@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ t('premium_titulo') }} — Sabueso{% endblock %}
+
+{% block contenido %}
+<main class="contenedor zona-panel">
+  <div class="panel panel--ancho panel--centro">
+    <div class="panel-cabeza">
+      {{ ui.logo(90, 55, "cafe") }}
+      <h1 class="panel-titulo">{{ t('premium_titulo') }}</h1>
+      <p class="panel-baja">{{ t('premium_baja') }}</p>
+      <p class="precio">USD {{ '%g'|format(precio) }}<span class="visualmente-oculto"> {{ t('mes') }}</span></p>
+      {% if moneda_local != 'USD' %}<p class="precio-local">{{ t('mes') }} · ≈ {{ '%g'|format(precio_local) }} {{ moneda_local }}</p>{% endif %}
+    </div>
+
+    <ul class="incluye">
+      <li><span class="check-icono check-icono--ok" aria-hidden="true">✓</span><span>{{ t('inc1')|safe }}</span></li>
+      <li><span class="check-icono check-icono--ok" aria-hidden="true">✓</span><span>{{ t('inc2')|safe }}</span></li>
+      <li><span class="check-icono check-icono--ok" aria-hidden="true">✓</span><span>{{ t('inc3')|safe }}</span></li>
+    </ul>
+
+    {% if cobertura and cobertura != 'verde' %}
+    {# C10 · nota honesta antes de cobrar #}
+    <aside class="aviso-cobertura">
+      <div><strong>{{ t('premium_cob_nota_t', pais=pais_usuario) }}</strong><p>{{ t('premium_cob_nota') }} <a href="{{ url_for('main.cobertura') }}">{{ t('aviso_cob_ver_mapa') }}</a></p></div>
+    </aside>
+    {% endif %}
+
+    {% if not current_user.perfil_valido %}
+      <p class="panel-baja">{{ t('completa_primero', url=url_for('auth.perfil'))|safe }}</p>
+    {% else %}
+      <div class="acciones-columna">
+        <form method="POST" action="{{ url_for('billing.pagar') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-canela btn-bloque">
+            {% if pagos_configurados %}{{ t('pagar_mp') }}{% elif modo_demo %}{{ t('demo_activar') }}{% else %}{{ t('pagar_usd', p='%g'|format(precio)) }}{% endif %}
+          </button>
+        </form>
+      </div>
+      <p class="panel-pie">{% if pagos_configurados or modo_demo %}{{ t('renueva_mes') }}{% else %}{{ t('pagos_no') }}{% endif %}</p>
+    {% endif %}
+
+    <div class="mini-correo" aria-hidden="true">
+      <p class="mini-correo-cab">{{ t('asi_llega') }}</p>
+      <p class="mini-item"><span class="nivel-mini nivel-mini--regional">{{ t('nv_regional') }}</span> <strong>FNDR 8% O'Higgins — Deportistas Destacados</strong> GORE O'Higgins · {{ t('cierra_el', f='30-12-2026') }}</p>
+      <p class="mini-item mini-item--ultimo"><span class="nivel-mini nivel-mini--latam">{{ t('nv_latam') }}</span> <strong>Fondo de Innovación BID Lab</strong> BID · {{ t('permanente_corto')|lower }}</p>
+    </div>
+  </div>
+</main>
+{% endblock %}

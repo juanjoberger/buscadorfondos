@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ t('baja_titulo') }} — Sabueso{% endblock %}
+
+{% block contenido %}
+<main class="contenedor zona-panel">
+  <div class="panel panel--centro">
+    <div class="baja-icono" aria-hidden="true">✓</div>
+    <div class="panel-cabeza">
+      <h1 class="panel-titulo">{{ t('baja_titulo') }}</h1>
+      <p class="panel-baja">{{ t('baja_baja_sabueso', email=email)|safe }}</p>
+    </div>
+    <div class="acciones-columna">
+      <a class="btn btn-cafe btn-bloque" href="{{ url_for('main.index') }}">{{ t('volver_buscador') }}</a>
+      <a class="btn btn-borde btn-bloque" href="{{ url_for('billing.premium') }}">{{ t('fue_error') }}</a>
+    </div>
+    <p class="panel-pie">{{ t('nos_cuentas') }} <a href="mailto:{{ config.MAIL_FROM or 'hola@fundhound.lat' }}">{{ t('escribenos') }}</a> {{ t('leemos_todo') }}</p>
+  </div>
+</main>
+{% endblock %}

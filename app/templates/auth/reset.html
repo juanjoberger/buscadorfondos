@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ t('crea_nueva') }} — Sabueso{% endblock %}
+
+{% block contenido %}
+<main class="contenedor zona-panel">
+  <div class="panel">
+    <div class="panel-cabeza">
+      <h1 class="panel-titulo">{{ t('crea_nueva') }}</h1>
+      <p class="panel-baja">{{ t('sera_tu') }}</p>
+    </div>
+    <form action="{{ url_for('auth.reset', token=token) }}" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="campo">
+        <label for="password">{{ t('nueva_contrasena') }}</label>
+        <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
+        <p class="campo-nota">{{ t('evita_anterior') }}</p>
+      </div>
+      <button class="btn btn-canela btn-bloque" type="submit">{{ t('guardar_entrar') }}</button>
+    </form>
+  </div>
+</main>
+{% endblock %}

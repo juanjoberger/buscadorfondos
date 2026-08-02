@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crea tu cuenta — Sabueso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- P3 · Registro (conversión) — C11 casillas multi-ámbito -->
+
+<header class="nav">
+  <div class="contenedor nav-inner">
+    <a class="marca" href="p1-landing.html" aria-label="Sabueso — inicio">
+      <svg class="marca-logo" width="38" height="24" viewBox="0 0 72 44" aria-hidden="true"><ellipse cx="43" cy="21" rx="16" ry="9" fill="#D98A55"/><path d="M55 15 Q63 9 61 2 L65 3 Q66 12 58 18 Z" fill="#D98A55"/><rect x="48" y="26" width="4.5" height="15" rx="2" fill="#D98A55"/><rect x="39" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><rect x="30" y="27" width="4.5" height="14" rx="2" fill="#D98A55"/><path d="M32 15 Q24 16 17 26 L10 35 Q8 38 11 39 L16 38 Q22 33 26 28 Q31 24 34 20 Z" fill="#D98A55"/><ellipse cx="21" cy="29" rx="3.6" ry="7.5" transform="rotate(28 21 29)" fill="#F6F1E7"/><circle cx="8" cy="33" r="2" fill="#37C97E"/><circle cx="4" cy="27" r="1.7" fill="#6FC49A"/><circle cx="2" cy="20" r="1.4" fill="#B7E0CB"/></svg>
+      <span class="marca-nombre">Sabueso</span>
+    </a>
+    <nav class="nav-acciones" aria-label="Idioma y cuenta">
+      <span class="idioma"><a href="#" aria-current="true" lang="es">ES</a><a href="p1-landing-pt.html" lang="pt-BR">PT</a></span>
+      <a class="nav-link" href="p4-login.html">Entrar</a>
+    </nav>
+  </div>
+</header>
+
+<main class="contenedor zona-panel">
+  <div class="panel panel--ancho">
+    <div class="panel-cabeza">
+      <svg width="90" height="55" viewBox="0 0 72 44" aria-hidden="true"><ellipse cx="43" cy="21" rx="16" ry="9" fill="#2B1D10"/><path d="M55 15 Q63 9 61 2 L65 3 Q66 12 58 18 Z" fill="#2B1D10"/><rect x="48" y="26" width="4.5" height="15" rx="2" fill="#2B1D10"/><rect x="39" y="27" width="4.5" height="14" rx="2" fill="#2B1D10"/><rect x="30" y="27" width="4.5" height="14" rx="2" fill="#2B1D10"/><path d="M32 15 Q24 16 17 26 L10 35 Q8 38 11 39 L16 38 Q22 33 26 28 Q31 24 34 20 Z" fill="#2B1D10"/><ellipse cx="21" cy="29" rx="3.6" ry="7.5" transform="rotate(28 21 29)" fill="#D98A55"/><circle cx="8" cy="33" r="2" fill="#0B6B43"/><circle cx="4" cy="27" r="1.7" fill="#2E9E68"/><circle cx="2" cy="20" r="1.4" fill="#6FC49A"/><circle cx="4" cy="13" r="1.2" fill="#B7E0CB"/></svg>
+      <h1 class="panel-titulo">Suelta al sabueso</h1>
+      <p class="panel-baja">Dinos qué buscas y desde dónde postulas: ordenamos los fondos <strong>de tu comuna al mundo.</strong></p>
+    </div>
+
+    <form action="/registro" method="post">
+      <div class="campo">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" name="email" autocomplete="email" required placeholder="tu@correo.com">
+      </div>
+      <div class="campo">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" autocomplete="new-password" required minlength="8">
+        <p class="campo-nota">Mínimo 8 caracteres.</p>
+      </div>
+
+      <p class="form-titulo">¿Qué rastro seguimos?</p>
+
+      <!-- C11 · casillas multi-ámbito: puedes marcar más de uno -->
+      <fieldset class="campo">
+        <legend class="visualmente-oculto">Ámbitos de tu proyecto (puedes marcar varios)</legend>
+        <div class="ambitos">
+          <label class="ambito"><input type="checkbox" name="ambitos" value="emprendimiento" checked><span>Emprendimiento</span></label>
+          <label class="ambito"><input type="checkbox" name="ambitos" value="ong"><span>ONG / Fundación</span></label>
+          <label class="ambito"><input type="checkbox" name="ambitos" value="investigacion"><span>Investigación / Académico</span></label>
+          <label class="ambito"><input type="checkbox" name="ambitos" value="empresa"><span>Empresa privada</span></label>
+          <label class="ambito ambito--ancho"><input type="checkbox" name="ambitos" value="cultura" checked><span>Cultura, patrimonio y artes</span></label>
+        </div>
+        <p class="campo-nota">Puedes marcar más de uno.</p>
+      </fieldset>
+
+      <!-- selects dependientes: opciones de muestra, el sistema las puebla por JS -->
+      <div class="campo">
+        <label for="pais">País desde donde postulas</label>
+        <select id="pais" name="pais" required>
+          <option value="" selected disabled>Elige tu país…</option>
+          <option>Argentina</option><option>Bolivia</option><option>Brasil</option>
+          <option>Chile</option><option>Colombia</option><option>Costa Rica</option>
+          <option>Cuba</option><option>Ecuador</option><option>El Salvador</option>
+          <option>Guatemala</option><option>Honduras</option><option>México</option>
+          <option>Nicaragua</option><option>Panamá</option><option>Paraguay</option>
+          <option>Perú</option><option>República Dominicana</option><option>Uruguay</option>
+          <option>Venezuela</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="region">Región / provincia / estado</label>
+        <select id="region" name="region">
+          <option value="" selected>Elige tu región…</option>
+          <option>O'Higgins</option><option>Metropolitana</option><option>Valparaíso</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="comuna">Comuna o ciudad <span class="campo-nota">(opcional)</span></label>
+        <select id="comuna" name="comuna">
+          <option value="" selected>Elige tu comuna…</option>
+          <option>Rancagua</option><option>Machalí</option><option>San Fernando</option>
+        </select>
+        <p class="campo-nota">Afina el rastro local: municipios y organizaciones de tu zona.</p>
+      </div>
+
+      <div class="campo campo-check">
+        <input type="checkbox" id="alertas" name="alertas" checked>
+        <label for="alertas">Quiero recibir <strong>alertas de fondos nuevos</strong> por correo (USD 3/mes — se activan después con Mercado Pago).</label>
+      </div>
+
+      <button class="btn btn-canela btn-bloque" type="submit">Crear mi cuenta</button>
+    </form>
+
+    <p class="panel-pie">¿Ya tienes cuenta? <a href="p4-login.html">Entrar</a></p>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="contenedor pie-inner">
+    <span>© 2026 FundHound — Sabueso · Sabujo</span>
+    <span><a href="p10-cobertura.html">Mapa de cobertura</a> · <a href="#">Contacto</a> · <a href="#">Términos</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

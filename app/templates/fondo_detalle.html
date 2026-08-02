@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ fondo.nombre }} — Sabueso{% endblock %}
+{% block descripcion %}{{ fondo.nombre }} · {{ fondo.institucion }}. {{ t('meta_desc') }}{% endblock %}
+
+{% block contenido %}
+<main class="contenedor">
+
+  <div class="detalle-cabeza">
+    <a class="volver" href="{{ url_for('main.index') }}">{{ t('volver') }}</a>
+    <div class="detalle-tags">
+      <span class="tag-nivel franja--{{ ['local','regional','nacional','latam','global'][fondo.alcance] }}">
+        {% if fondo.alcance <= 2 %}{{ [t('nv_local'), t('nv_regional'), t('nv_nacional')][fondo.alcance] }} · {{ fondo.pais }}{% elif fondo.alcance == 3 %}{{ t('g_latam') }}{% else %}{{ t('nv_global') }}{% endif %}
+      </span>
+      {% if fondo.estado == 'abierta' and fondo.dias_para_cierre is not none and fondo.dias_para_cierre <= 10 %}
+      <span class="pill-urgente">{{ t('cierra_en', n=fondo.dias_para_cierre, s='s' if fondo.dias_para_cierre != 1 else '') }}</span>
+      {% endif %}
+    </div>
+    <h1>{{ fondo.nombre }}</h1>
+    {% if fondo.institucion %}<p class="detalle-inst">{{ fondo.institucion }}</p>{% endif %}
+  </div>
+
+  <div class="detalle">
+    <div>
+      {% if fondo.descripcion %}
+      <section class="detalle-seccion">
+        <h2>{{ t('sobre') }}</h2>
+        <p>{{ fondo.descripcion }}</p>
+      </section>
+      {% endif %}
+      <section class="detalle-seccion">
+        <h2>{{ t('ambito_calza') }}</h2>
+        <p>{{ PERFILES.get(fondo.perfil, fondo.perfil) }}</p>
+      </section>
+      <section class="detalle-seccion">
+        <h2>{{ t('antes_postular') }}</h2>
+        <p>{{ t('antes_postular_p') }}</p>
+      </section>
+    </div>
+
+    <aside class="detalle-aside">
+      <div class="ficha">
+        <dl>
+          <div class="ficha-fila"><dt>{{ t('f_alcance') }}</dt><dd>{{ [t('nv_local'), t('nv_regional'), t('nv_nacional'), t('g_latam'), t('nv_global')][fondo.alcance] }}</dd></div>
+          <div class="ficha-fila"><dt>{{ t('f_ubicacion') }}</dt><dd>{{ ui.ubicacion_texto(fondo) }}</dd></div>
+          <div class="ficha-fila"><dt>{{ t('f_monto') }}</dt><dd>{{ fondo.monto_texto or t('segun_bases') }}</dd></div>
+          {% if fondo.fecha_apertura %}<div class="ficha-fila"><dt>{{ t('f_apertura') }}</dt><dd>{{ fondo.fecha_apertura.strftime('%d-%m-%Y') }}</dd></div>{% endif %}
+          <div class="ficha-fila ficha-fila--ultima"><dt>{{ t('f_cierre') }}</dt><dd>{{ fondo.fecha_cierre.strftime('%d-%m-%Y') if fondo.fecha_cierre else t('permanente_corto') }}</dd></div>
+        </dl>
+        {% if fondo.estado == 'abierta' and fondo.dias_para_cierre is not none and fondo.dias_para_cierre <= 10 %}
+        <p class="ficha-cierre">{{ t('quedan_dias', nplural='n' if fondo.dias_para_cierre != 1 and idioma == 'es' else ('m' if fondo.dias_para_cierre != 1 else ''), n=fondo.dias_para_cierre, s='s' if fondo.dias_para_cierre != 1 else '') }}</p>
+        {% endif %}
+        <a class="btn btn-canela btn-bloque" href="{{ fondo.link }}" rel="external noopener" target="_blank">{{ t('postular_oficial') }}</a>
+        <p class="fuente">{{ t('fuente_sabueso', f=fondo.fuente or fondo.institucion, d=fondo.updated_at.strftime('%d-%m-%Y')) }}</p>
+      </div>
+    </aside>
+  </div>
+</main>
+{% endblock %}

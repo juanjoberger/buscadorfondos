@@ -1,0 +1,28 @@
+[tool.ruff]
+# Lint y formato del proyecto. Correr: ./venv/bin/ruff check .
+line-length = 100
+target-version = "py310"
+exclude = ["venv", "instance", "data", "__pycache__", "migrations"]
+
+[tool.ruff.lint]
+# E/W pycodestyle · F pyflakes (imports y variables sin uso) · I orden de imports
+# B bugbear (errores sutiles) · S bandit (seguridad) · UP modernización
+select = ["E", "W", "F", "I", "B", "UP", "S"]
+ignore = [
+    "E501",    # el largo de línea lo controla line-length y hay textos largos legítimos
+    "S101",    # assert: se usa en los scripts de verificación
+    "B008",    # llamadas en defaults: patrón normal en SQLAlchemy
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Los scripts son herramientas de operación: pueden imprimir y salir con sys.exit.
+"scripts/*" = ["S603", "S607"]
+# El scraper hace requests a sitios públicos declarados en el catálogo de fuentes.
+"scripts/scrapers.py" = ["S310"]
+# Descarga el catálogo de ubicaciones desde una URL fija y conocida.
+"scripts/actualizar_ubicaciones.py" = ["S310"]
+# Contraseñas de PRUEBA, a propósito y solo para entornos de QA.
+"scripts/qa_seed.py" = ["S105"]
+"scripts/qa_smoke.py" = ["S105"]
+# load_dotenv() debe correr antes de importar la app (lee la config del entorno).
+"run.py" = ["E402"]

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui with context %}
+{% block title %}{{ codigo }} — Sabueso{% endblock %}
+
+{% block contenido %}
+<main class="contenedor">
+  <div class="error-panel">
+    {{ ui.logo(120, 74, "gris") }}
+    <p class="error-codigo">{{ t('err_codigo', n=codigo) }}</p>
+    <h1>{{ t(clave ~ '_t') }}</h1>
+    <p class="error-baja">{{ t(clave) }}</p>
+    <div class="acciones-columna">
+      <a class="btn btn-canela btn-bloque" href="{{ url_for('main.index') }}">{{ t('ir_buscador') }}</a>
+      <a class="btn btn-borde btn-bloque" href="{{ url_for('main.cobertura') }}">{{ t('nav_cobertura') }}</a>
+    </div>
+  </div>
+</main>
+{% endblock %}
